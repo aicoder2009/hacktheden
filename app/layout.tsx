@@ -4,6 +4,7 @@ import { Geist_Mono, Outfit, Oxanium } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { isDemo } from "@/lib/demo/mode"
 import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
 
@@ -30,8 +31,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       className={cn("antialiased", fontMono.variable, "font-sans", outfit.variable, oxaniumHeading.variable)}
     >
       <body className="min-h-svh">
-        {/* Without Clerk keys (only the dev /preview route works then), skip the provider. */}
-        {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? <ClerkProvider>{app}</ClerkProvider> : app}
+        {/* Local demo mode uses its own user switcher instead of Clerk. */}
+        {isDemo() ? app : <ClerkProvider>{app}</ClerkProvider>}
       </body>
     </html>
   )

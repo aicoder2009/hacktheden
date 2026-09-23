@@ -23,6 +23,17 @@ Hackathon platform for the Basha DevOps Club. It handles in-person check-in, tea
   - Officers can override the order before locking results.
   - Officers pick prize-category winners when they lock results.
 
+## Try it locally (demo mode)
+
+```bash
+npm install
+npm run demo
+```
+
+Open <http://localhost:3000/demo>. The demo stores its data in `.demo/` on your machine and uses fake photo storage and fake AI keys, so it doesn't need AWS, Clerk or OpenRouter. You can pick any sample person (officer, judge, mentor or participant) and switch between them. Use **Reset all demo data** to start over.
+
+Picking who you are is only for demos. Demo mode is off unless you start it with `npm run demo`, and it can never switch on in production. `npm run dev` and every deployment use real Clerk sign-in.
+
 ## Setup
 
 ### 1. Install

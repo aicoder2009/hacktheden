@@ -11,6 +11,7 @@ import { currentAndNext } from "@/lib/schedule"
 import { cn } from "@/lib/utils"
 import type { DashboardData } from "@/lib/views"
 import { AiCard } from "../_components/ai-card"
+import { NextSteps } from "../_components/next-steps"
 
 const fetcher = (url: string) => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(r)))
 
@@ -59,6 +60,8 @@ export function DashboardView({ initial }: { initial: DashboardData }) {
           />
         </div>
       </section>
+
+      <NextSteps data={data} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
@@ -148,7 +151,9 @@ export function DashboardView({ initial }: { initial: DashboardData }) {
         </div>
 
         <div className="space-y-4">
-          <AiCard hasTeam={!!team} />
+          <div id="ai" className="scroll-mt-16">
+            <AiCard hasTeam={!!team} />
+          </div>
 
           <Card>
             <CardHeader>

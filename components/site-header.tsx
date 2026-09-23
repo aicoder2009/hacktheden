@@ -8,14 +8,13 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/team", label: "Team" },
     { href: "/submission", label: "Submission" },
-    { href: "/help", label: "Help" },
-    { href: "/results", label: "Results" },
+    { href: "/help", label: "Get help" },
   ],
   mentor: [{ href: "/mentor", label: "Help queue" }],
-  judge: [{ href: "/judge", label: "Judging" }],
+  judge: [{ href: "/judge", label: "Score projects" }],
   officer: [
     { href: "/admin", label: "Admin" },
-    { href: "/judge", label: "Judging" },
+    { href: "/judge", label: "Score projects" },
     { href: "/mentor", label: "Help queue" },
   ],
 }
@@ -24,9 +23,11 @@ export function SiteHeader({
   role,
   eventName,
   demoUser,
+  resultsReleased = false,
 }: {
   role?: Role
   eventName: string
+  resultsReleased?: boolean
   /** Set in local demo mode: shows a user switcher instead of Clerk's account menu. */
   demoUser?: string | null
 }) {
@@ -39,7 +40,15 @@ export function SiteHeader({
           </span>
           <span className="hidden sm:inline">{eventName}</span>
         </Link>
-        {role && <NavLinks links={NAV[role]} />}
+        {role && (
+          <NavLinks
+            links={
+              role === "participant" && resultsReleased
+                ? [...NAV.participant, { href: "/results", label: "🏆 Results" }]
+                : NAV[role]
+            }
+          />
+        )}
         <div className="ml-auto">
           {demoUser !== undefined ? (
             <Link href="/demo" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground">

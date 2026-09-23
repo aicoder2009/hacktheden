@@ -2,6 +2,7 @@
 
 import { FullScreenIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import useSWR from "swr"
 import { useNow } from "@/app/mentor/_components/use-now"
@@ -74,6 +75,15 @@ export function Screen({ token, initial }: { token: string; initial: ScreenData 
             <span className="size-2 animate-pulse bg-destructive" /> Reconnecting…
           </div>
         )}
+        <Link
+          href="/home"
+          className={cn(
+            "fixed top-[1vw] left-1/2 z-50 -translate-x-1/2 px-2 py-1 font-mono text-xs text-muted-foreground opacity-30 transition-opacity hover:opacity-100 focus-visible:opacity-100",
+            idle && "pointer-events-none opacity-0"
+          )}
+        >
+          ← Back to app
+        </Link>
         <button
           type="button"
           aria-label="Toggle fullscreen"
