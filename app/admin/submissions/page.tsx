@@ -1,5 +1,4 @@
 import { PageHeader } from "@/components/page-header"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { listSubmissions, listTeams } from "@/lib/data"
 import { presignMany } from "@/lib/s3"
@@ -26,7 +25,6 @@ export default async function SubmissionsPage() {
       {sorted.length === 0 && <p className="text-sm text-muted-foreground">No submissions yet.</p>}
       <div className="grid gap-4">
         {sorted.map((s, i) => {
-          const tools = [...s.aiTools, ...(s.aiToolsOther ? [s.aiToolsOther] : [])]
           const links = [
             { label: "Repo", href: s.repoUrl },
             { label: "Demo", href: s.demoUrl },
@@ -61,15 +59,6 @@ export default async function SubmissionsPage() {
                       >
                         {l.label}: {l.href}
                       </a>
-                    ))}
-                  </div>
-                )}
-                {tools.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {tools.map((t) => (
-                      <Badge key={t} variant="outline">
-                        {t}
-                      </Badge>
                     ))}
                   </div>
                 )}

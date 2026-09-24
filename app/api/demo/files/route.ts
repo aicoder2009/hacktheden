@@ -1,7 +1,7 @@
 import fs from "node:fs/promises"
 import path from "node:path"
 import { NextResponse } from "next/server"
-import { isDemo } from "@/lib/demo/mode"
+import { isLocalData } from "@/lib/demo/mode"
 
 // Demo mode stand-in for S3: stores uploaded photos under .demo/uploads.
 const ROOT = path.join(process.cwd(), ".demo", "uploads")
@@ -9,7 +9,7 @@ const TYPES: Record<string, string> = { jpg: "image/jpeg", png: "image/png", web
 
 function fileFor(req: Request) {
   const key = new URL(req.url).searchParams.get("key") ?? ""
-  if (!isDemo() || !key.startsWith("events/") || key.includes("..")) return null
+  if (!isLocalData() || !key.startsWith("events/") || key.includes("..")) return null
   return path.join(ROOT, key)
 }
 

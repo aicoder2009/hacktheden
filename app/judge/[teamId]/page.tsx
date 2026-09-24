@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { badgeVariants } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { pageUser } from "@/lib/auth"
 import { getScore } from "@/lib/data"
@@ -85,19 +84,6 @@ export default async function JudgeTeamPage({ params }: { params: Promise<{ team
               ) : (
                 <p className="text-xs text-muted-foreground">No members listed.</p>
               )}
-            </Section>
-            <Section title="AI tools used">
-              {sub.aiTools.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {sub.aiTools.map((t) => (
-                    <span key={t} className={badgeVariants({ variant: "secondary" })}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {sub.aiToolsOther && <p className="mt-2 text-xs whitespace-pre-wrap">{sub.aiToolsOther}</p>}
-              {!sub.aiTools.length && !sub.aiToolsOther && <p className="text-xs text-muted-foreground">None listed.</p>}
             </Section>
           </div>
 

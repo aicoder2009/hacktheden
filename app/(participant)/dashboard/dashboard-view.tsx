@@ -6,6 +6,7 @@ import { Countdown } from "@/components/countdown"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatRejoinCode } from "@/lib/codes"
 import { fmtAgo, fmtTime } from "@/lib/format"
 import { currentAndNext } from "@/lib/schedule"
 import { cn } from "@/lib/utils"
@@ -151,6 +152,18 @@ export function DashboardView({ initial }: { initial: DashboardData }) {
         </div>
 
         <div className="space-y-4">
+          {data.me.rejoinCode && (
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle>Your rejoin code</CardTitle>
+                <CardDescription>Use it to get back in on another device or after clearing your browser.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="font-mono text-2xl font-semibold tracking-[0.2em]">{formatRejoinCode(data.me.rejoinCode)}</div>
+                <p className="mt-1 text-muted-foreground">Keep it to yourself — anyone with it can act as you.</p>
+              </CardContent>
+            </Card>
+          )}
           <div id="ai" className="scroll-mt-16">
             <AiCard hasTeam={!!team} />
           </div>

@@ -1,16 +1,3 @@
-export const AI_TOOLS = [
-  "Claude Code",
-  "Cursor",
-  "GitHub Copilot",
-  "opencode",
-  "Cline",
-  "Windsurf",
-  "ChatGPT / Codex",
-  "Gemini",
-  "v0",
-  "Lovable / Bolt",
-] as const
-
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 /** Checked against OpenRouter pricing Sep 2026 — re-verify the week before the event. */

@@ -21,3 +21,18 @@ describe("isDemo", () => {
     expect(isDemo()).toBe(false)
   })
 })
+
+describe("isLocalData", () => {
+  it("uses local data in dev without AWS keys, but never in production", async () => {
+    const { isLocalData } = await import("./mode")
+    vi.stubEnv("NODE_ENV", "development")
+    vi.stubEnv("DEMO_MODE", "")
+    vi.stubEnv("APP_AWS_ACCESS_KEY_ID", "")
+    expect(isLocalData()).toBe(true)
+    vi.stubEnv("APP_AWS_ACCESS_KEY_ID", "AKIA_TEST")
+    expect(isLocalData()).toBe(false)
+    vi.stubEnv("NODE_ENV", "production")
+    vi.stubEnv("APP_AWS_ACCESS_KEY_ID", "")
+    expect(isLocalData()).toBe(false)
+  })
+})

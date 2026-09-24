@@ -6,6 +6,7 @@ import { getItem, isConditionFailure, putItem, updateItem } from "./db"
 import { keys } from "./data"
 import { isDemo } from "./demo/mode"
 import { superAdminEmails } from "./env"
+import { sessionUser } from "./session"
 import type { Role, User } from "./types"
 
 /** Thrown for expected failures; `run()` turns it into `{ ok: false, error }`. */
@@ -15,16 +16,20 @@ export const DEMO_COOKIE = "demo_uid"
 
 export const isSuperAdmin = (email: string) => superAdminEmails().includes(email.toLowerCase())
 
-/** The signed-in user's DB record, created on first visit. Super-admins are always officers. */
+/**
+ * Who is making this request. Staff sign in with Clerk (their record is created on first visit and
+ * super-admins are always officers); participants hold an account-less session from /join.
+ */
 export const getMe = cache(async (): Promise<User | null> => {
   // Demo mode: "sign in" by picking a sample user on /demo (stored in a cookie).
   if (isDemo()) {
     const id = (await cookies()).get(DEMO_COOKIE)?.value
-    return id ? ((await getItem<User>(keys.user(id))) ?? null) : null
+    const picked = id ? await getItem<User>(keys.user(id)) : undefined
+    return picked ?? sessionUser()
   }
 
   const { userId } = await auth()
-  if (!userId) return null
+  if (!userId) return sessionUser()
 
   let user = await getItem<User>(keys.user(userId))
   if (!user) {
@@ -65,10 +70,11 @@ export async function requireVerifiedParticipant() {
   return user
 }
 
-/** For pages: redirect instead of throwing. */
+/** For pages: redirect instead of throwing. Staff-only pages send you to Clerk, everything else to /join. */
 export async function pageUser(...roles: Role[]) {
   const user = await getMe()
-  if (!user) redirect(isDemo() ? "/demo" : "/sign-in")
+  const staffOnly = roles.length > 0 && !roles.includes("participant")
+  if (!user) redirect(isDemo() ? "/demo" : staffOnly ? "/sign-in" : "/join")
   if (roles.length && !roles.includes(user.role)) redirect("/")
   return user
 }

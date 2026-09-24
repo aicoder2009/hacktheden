@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { isDemo } from "./demo/mode"
+import { isLocalData } from "./demo/mode"
 
 const schema = z.object({
   EVENT_ID: z.string().min(1),
@@ -17,7 +17,7 @@ let cached: z.infer<typeof schema> | undefined
 // Parsed lazily so builds don't need runtime secrets.
 export function env() {
   cached ??= schema.parse(
-    isDemo()
+    isLocalData()
       ? {
           EVENT_ID: "demo",
           SUPER_ADMIN_EMAILS: "karthickarun2009@gmail.com",

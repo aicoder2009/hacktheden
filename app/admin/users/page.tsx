@@ -17,6 +17,7 @@ export default async function UsersPage() {
       role: u.role,
       verified: !!u.verifiedAt,
       teamName: u.teamId ? (teamName.get(u.teamId) ?? "Unknown team") : null,
+      rejoinCode: u.rejoinCode ?? null,
       createdAt: u.createdAt,
       superAdmin: isSuperAdmin(u.email),
     }))
@@ -24,7 +25,7 @@ export default async function UsersPage() {
     <>
       <PageHeader
         title="People"
-        description="Everyone who has signed in. Change roles and verification here — people on a team must leave it before becoming staff."
+        description="Everyone who has joined or signed in. Staff sign in with Clerk; participants join with the room code and can get back in with their rejoin code."
       />
       <UsersTable rows={rows} />
     </>

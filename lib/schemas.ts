@@ -14,8 +14,6 @@ export const submissionDraftSchema = z.object({
   repoUrl: z.string().trim().max(300).default(""),
   demoUrl: z.string().trim().max(300).default(""),
   videoUrl: z.string().trim().max(300).default(""),
-  aiTools: z.array(text(40)).max(20).default([]),
-  aiToolsOther: text(500).default(""),
   photoKeys: z.array(z.string()).max(MAX_PHOTOS).default([]),
   consentPhotos: z.boolean().default(false),
   consentMit: z.boolean().default(false),

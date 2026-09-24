@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache"
 import { parse, run } from "@/lib/action"
 import { AppError, isSuperAdmin, requireRole } from "@/lib/auth"
-import { newId, newScreenToken, randomCode } from "@/lib/codes"
+import { newId, newRejoinCode, newScreenToken, randomCode } from "@/lib/codes"
 import { getEvent, getTeam, getUser, keys, listScores, listTeams } from "@/lib/data"
-import { deleteItem, putItem, updateItem } from "@/lib/db"
+import { deleteItem, isConditionFailure, putItem, transact, tx, updateItem } from "@/lib/db"
 import { getKey, setKeyDisabled } from "@/lib/openrouter"
 import { isFinale } from "@/lib/reveal"
 import {
@@ -81,6 +81,30 @@ export async function setUserVerified(userId: string, verified: boolean) {
     else await updateItem(keys.user(userId), { verifyFails: 0 }, { remove: ["verifiedAt"] })
     revalidatePath("/admin/users")
     return null
+  })
+}
+
+/** Give a participant a fresh rejoin code (e.g. they lost it or it leaked). */
+export async function resetRejoinCode(userId: string) {
+  return run(async () => {
+    await officer()
+    const target = await getUser(userId)
+    if (!target || target.role !== "participant") throw new AppError("Only participants have rejoin codes.")
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const code = newRejoinCode()
+      try {
+        await transact([
+          tx.put(keys.rejoin(code), { userId }, "attribute_not_exists(PK)"),
+          ...(target.rejoinCode ? [tx.del(keys.rejoin(target.rejoinCode))] : []),
+          tx.update(keys.user(userId), "SET rejoinCode = :c", { values: { ":c": code } }),
+        ])
+        revalidatePath("/admin/users")
+        return { code }
+      } catch (e) {
+        if (!isConditionFailure(e)) throw e
+      }
+    }
+    throw new AppError("Couldn't generate a code — try again.")
   })
 }
 

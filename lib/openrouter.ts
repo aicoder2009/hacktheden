@@ -1,4 +1,4 @@
-import { isDemo } from "./demo/mode"
+import { isLocalData } from "./demo/mode"
 import { env } from "./env"
 
 const BASE = "https://openrouter.ai/api/v1/keys"
@@ -21,7 +21,7 @@ function demoInfo(hash: string): KeyInfo {
 }
 
 async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
-  if (isDemo()) {
+  if (isLocalData()) {
     if (init.method === "POST") {
       const hash = `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
       return { key: `sk-or-v1-demo-${hash.slice(-6)}9c2e1b4d7f3a`, data: demoInfo(hash) } as T

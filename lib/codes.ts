@@ -26,3 +26,12 @@ export function safeEqual(a: string, b: string) {
 export function newId() {
   return randomBytes(8).toString("hex")
 }
+
+/** Personal rejoin code for account-less participants, shown as XXXX-XXXX. */
+export function newRejoinCode() {
+  return randomCode(8)
+}
+
+export function formatRejoinCode(code: string) {
+  return `${code.slice(0, 4)}-${code.slice(4)}`
+}

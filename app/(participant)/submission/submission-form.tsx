@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { AI_TOOLS, CONSENT_MIT, CONSENT_PHOTOS, MAX_PHOTOS, MAX_PHOTO_BYTES, PHOTO_TYPES } from "@/lib/constants"
+import { CONSENT_MIT, CONSENT_PHOTOS, MAX_PHOTOS, MAX_PHOTO_BYTES, PHOTO_TYPES } from "@/lib/constants"
 import { fmtDateTime } from "@/lib/format"
 import type { SubmissionInput } from "@/lib/schemas"
 import type { Submission } from "@/lib/types"
@@ -45,8 +45,6 @@ export function SubmissionForm({
     repoUrl: initial?.repoUrl ?? "",
     demoUrl: initial?.demoUrl ?? "",
     videoUrl: initial?.videoUrl ?? "",
-    aiTools: initial?.aiTools ?? [],
-    aiToolsOther: initial?.aiToolsOther ?? "",
     photoKeys: initial?.photoKeys ?? [],
     consentPhotos: initial?.consentPhotos ?? false,
     consentMit: initial?.consentMit ?? false,
@@ -146,37 +144,6 @@ export function SubmissionForm({
                 <Input value={form.videoUrl} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://" inputMode="url" />
               </Field>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>How you used AI</CardTitle>
-            <CardDescription>Judges look at this for the “Use of AI” criterion.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {AI_TOOLS.map((tool) => (
-                <label key={tool} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={form.aiTools.includes(tool)}
-                    onCheckedChange={(c) =>
-                      set("aiTools", c ? [...form.aiTools, tool] : form.aiTools.filter((t) => t !== tool))
-                    }
-                  />
-                  {tool}
-                </label>
-              ))}
-            </div>
-            <Field label="Models, workflow, other tools">
-              <Textarea
-                value={form.aiToolsOther}
-                onChange={(e) => set("aiToolsOther", e.target.value)}
-                rows={3}
-                maxLength={500}
-                placeholder="e.g. DeepSeek V4.1 Flash via opencode for the backend, v0 for the UI…"
-              />
-            </Field>
           </CardContent>
         </Card>
 

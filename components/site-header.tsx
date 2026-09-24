@@ -1,5 +1,6 @@
 import { UserButton } from "@clerk/nextjs"
 import Link from "next/link"
+import { leaveSession } from "@/actions/join"
 import type { Role } from "@/lib/types"
 import { NavLinks } from "./nav-links"
 
@@ -23,6 +24,7 @@ export function SiteHeader({
   role,
   eventName,
   demoUser,
+  participant,
   resultsReleased = false,
 }: {
   role?: Role
@@ -30,6 +32,8 @@ export function SiteHeader({
   resultsReleased?: boolean
   /** Set in local demo mode: shows a user switcher instead of Clerk's account menu. */
   demoUser?: string | null
+  /** Account-less participant (joined with the room code): show their name and a Leave button. */
+  participant?: { name: string }
 }) {
   return (
     <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
@@ -56,6 +60,13 @@ export function SiteHeader({
               <span className="hidden sm:inline">{demoUser ?? "Not signed in"}</span>
               <span className="underline underline-offset-2">Switch user</span>
             </Link>
+          ) : participant ? (
+            <form action={leaveSession} className="flex items-center gap-2 text-xs">
+              <span className="hidden text-muted-foreground sm:inline">{participant.name}</span>
+              <button type="submit" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
+                Leave
+              </button>
+            </form>
           ) : (
             <UserButton />
           )}

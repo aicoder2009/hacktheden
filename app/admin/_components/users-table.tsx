@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { setUserRole, setUserVerified } from "@/actions/admin"
+import { resetRejoinCode, setUserRole, setUserVerified } from "@/actions/admin"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAction } from "@/components/use-action"
+import { formatRejoinCode } from "@/lib/codes"
 import { ROLES, type Role } from "@/lib/types"
 import { LocalTime } from "./local-time"
 import { NativeSelect } from "./native-select"
@@ -18,6 +19,7 @@ export type UserRow = {
   role: Role
   verified: boolean
   teamName: string | null
+  rejoinCode: string | null
   createdAt: string
   superAdmin: boolean
 }
@@ -63,6 +65,7 @@ export function UsersTable({ rows }: { rows: UserRow[] }) {
               <TableHead>Role</TableHead>
               <TableHead>Verified</TableHead>
               <TableHead>Team</TableHead>
+              <TableHead>Rejoin code</TableHead>
               <TableHead>Joined</TableHead>
             </TableRow>
           </TableHeader>
@@ -72,7 +75,7 @@ export function UsersTable({ rows }: { rows: UserRow[] }) {
             ))}
             {shown.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                   {rows.length === 0 ? "Nobody has signed in yet." : "No matches."}
                 </TableCell>
               </TableRow>
@@ -130,6 +133,26 @@ function UserRowView({ row }: { row: UserRow }) {
         )}
       </TableCell>
       <TableCell>{row.teamName ?? <span className="text-muted-foreground">—</span>}</TableCell>
+      <TableCell>
+        {row.rejoinCode ? (
+          <span className="flex items-center gap-2">
+            <code className="font-mono">{formatRejoinCode(row.rejoinCode)}</code>
+            <button
+              type="button"
+              disabled={pending}
+              className="text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              onClick={() => {
+                if (confirm(`Give ${row.name} a new rejoin code? The old one stops working.`))
+                  void exec(() => resetRejoinCode(row.id), { success: "New rejoin code issued" })
+              }}
+            >
+              new
+            </button>
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </TableCell>
       <TableCell className="text-muted-foreground">
         <LocalTime iso={row.createdAt} />
       </TableCell>

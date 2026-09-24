@@ -9,7 +9,7 @@ import {
   UpdateCommand,
   type TransactWriteCommandInput,
 } from "@aws-sdk/lib-dynamodb"
-import { isDemo } from "./demo/mode"
+import { isLocalData } from "./demo/mode"
 import { memDelete, memGet, memPut, memQuery, memTransact, memUpdate } from "./demo/memory-db"
 import { seedDemo } from "./demo/seed"
 import { awsConfig, env } from "./env"
@@ -30,7 +30,7 @@ type Item = Record<string, unknown>
 
 /** Demo mode keeps data in a local file; seeded with sample data on first use. */
 function demo() {
-  if (!isDemo()) return false
+  if (!isLocalData()) return false
   seedDemo(pk())
   return true
 }

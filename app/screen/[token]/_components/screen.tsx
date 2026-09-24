@@ -181,7 +181,7 @@ function Normal({ data, now }: { data: Live; now: number }) {
             {data.roomCode}
           </div>
           <p className="mt-[1vw] text-[1.1vw] text-muted-foreground">
-            Check in at <span className="font-mono text-foreground">{window.location.host}/verify</span>
+            Join at <span className="font-mono text-foreground">{window.location.host}/join</span>
           </p>
         </Panel>
 

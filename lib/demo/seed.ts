@@ -1,5 +1,6 @@
 /** Sample data for demo mode: a hackathon in full swing, ~1h in with 2h of hacking left. */
 import type { Announcement, EventMeta, ScheduleItem, Score, Submission, Team, Ticket, User } from "../types"
+import { newRejoinCode } from "../codes"
 import { memGet, memPut } from "./memory-db"
 
 export const DEMO_SCREEN_TOKEN = "demo-screen"
@@ -15,7 +16,7 @@ export function seedDemo(pk: string) {
     startsAt: at(-60),
     submissionDeadline: at(120),
     endsAt: at(210),
-    lumaUrl: "https://lu.ma/",
+    lumaUrl: "https://luma.com/61q0tpoz",
     roomCode: "HACK26",
     screenToken: DEMO_SCREEN_TOKEN,
     aiBudgetUsd: 5,
@@ -66,8 +67,6 @@ export function seedDemo(pk: string) {
           "Upload a PDF or paste your notes and StudyBuddy turns them into adaptive quizzes. It tracks what you miss and re-asks it later using spaced repetition. Built with Next.js and DeepSeek V4.1 Flash.",
         repoUrl: "https://github.com/null-pointers/studybuddy",
         demoUrl: "https://studybuddy.vercel.app",
-        aiTools: ["Claude Code", "opencode", "v0"],
-        aiToolsOther: "DeepSeek V4.1 Flash via opencode for the backend; v0 for the quiz UI.",
       },
     },
     {
@@ -80,8 +79,6 @@ export function seedDemo(pk: string) {
         description: "Connect a GitHub repo and every pull request gets a live preview URL and a QR code, so teachers can grade from their phone.",
         repoUrl: "https://github.com/deploy-on-friday/shipit",
         videoUrl: "https://youtu.be/dQw4w9WgXcQ",
-        aiTools: ["Cursor", "GitHub Copilot"],
-        aiToolsOther: "Qwen3 Coder Next in Cursor.",
       },
     },
     {
@@ -100,8 +97,6 @@ export function seedDemo(pk: string) {
         repoUrl: "https://github.com/prompt-engineers/carboncoach",
         demoUrl: "https://carboncoach.vercel.app",
         videoUrl: "https://youtu.be/dQw4w9WgXcQ",
-        aiTools: ["Claude Code", "Gemini", "Lovable / Bolt"],
-        aiToolsOther: "GLM-5.3 Flash for receipt parsing.",
       },
     },
   ]
@@ -131,8 +126,6 @@ export function seedDemo(pk: string) {
         repoUrl: "",
         demoUrl: "",
         videoUrl: "",
-        aiTools: [],
-        aiToolsOther: "",
         photoKeys: [],
         consentPhotos: sub.status === "submitted",
         consentMit: sub.status === "submitted",
@@ -144,7 +137,13 @@ export function seedDemo(pk: string) {
       put(`SUB#${t.id}`, full)
     }
   }
-  for (const u of users) put(`USER#${u.id}`, u)
+  for (const u of users) {
+    if (u.role === "participant") {
+      u.rejoinCode = newRejoinCode()
+      put(`REJOIN#${u.rejoinCode}`, { userId: u.id })
+    }
+    put(`USER#${u.id}`, u)
+  }
 
   // One judge has already scored so the leaderboard has something to show.
   const score = (teamId: string, s: number[]): Score => ({
@@ -170,7 +169,7 @@ export function seedDemo(pk: string) {
   for (const s of schedule) put(`SCHED#${s.id}`, s)
 
   const anns: Announcement[] = [
-    { id: `${at(-45)}#a1`, body: "Wi-Fi: BashaGuest — password is on the whiteboard. Mentors are wearing orange lanyards.", authorName: "Karthick Arun", createdAt: at(-45) },
+    { id: `${at(-45)}#a1`, body: "Wi-Fi: BashaGuest — password is on the whiteboard. Mentors are wearing green lanyards.", authorName: "Karthick Arun", createdAt: at(-45) },
     { id: `${at(-3)}#a2`, body: "🍕 Lunch is in the cafeteria in 30 minutes — bring your badge!", authorName: "Karthick Arun", createdAt: at(-3) },
   ]
   for (const a of anns) put(`ANN#${a.id}`, a)

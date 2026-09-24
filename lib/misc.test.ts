@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { CODE_ALPHABET, normalizeCode, randomCode } from "./codes"
+import { CODE_ALPHABET, formatRejoinCode, newRejoinCode, normalizeCode, randomCode } from "./codes"
 import { buildStages, isFinale, visibleStages } from "./reveal"
 import { currentAndNext } from "./schedule"
 import { photoKeysValid, submissionFinalSchema } from "./schemas"
@@ -48,6 +48,12 @@ describe("codes", () => {
   it("normalizes user input", () => {
     expect(normalizeCode(" abc-23 4 ")).toBe("ABC234")
   })
+  it("rejoin codes are 8 chars and round-trip through display formatting", () => {
+    const code = newRejoinCode()
+    expect(code).toHaveLength(8)
+    expect(formatRejoinCode(code)).toMatch(/^[A-Z2-9]{4}-[A-Z2-9]{4}$/)
+    expect(normalizeCode(formatRejoinCode(code).toLowerCase())).toBe(code)
+  })
 })
 
 describe("schedule", () => {
@@ -77,8 +83,6 @@ describe("submission schema", () => {
     repoUrl: "https://github.com/basha/rocket",
     demoUrl: "",
     videoUrl: "https://youtu.be/xyz",
-    aiTools: ["Claude Code"],
-    aiToolsOther: "",
     photoKeys: [],
     consentPhotos: true,
     consentMit: true,

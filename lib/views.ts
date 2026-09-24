@@ -42,7 +42,7 @@ export async function buildDashboard(user: User) {
   const submission = team ? await getSubmission(team.id) : undefined
   return {
     now: new Date().toISOString(),
-    me: { id: user.id, name: user.name, verified: !!user.verifiedAt },
+    me: { id: user.id, name: user.name, verified: !!user.verifiedAt, rejoinCode: user.rejoinCode ?? null },
     event: publicEvent(event),
     locked: isLocked(event, new Date()),
     team: team ? publicTeam(team) : null,

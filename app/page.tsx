@@ -1,15 +1,13 @@
-import { auth } from "@clerk/nextjs/server"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { getMe } from "@/lib/auth"
 import { getEvent } from "@/lib/data"
-import { isDemo } from "@/lib/demo/mode"
 import { fmtDay } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
 export default async function Landing() {
   const [isAuthenticated, event] = await Promise.all([
-    isDemo() ? getMe().then(Boolean) : auth().then((a) => a.isAuthenticated),
+    getMe().then(Boolean),
     getEvent(),
   ])
   const date = event.startsAt
@@ -18,8 +16,8 @@ export default async function Landing() {
 
   const steps = [
     { n: "01", title: "RSVP on Luma", body: "Grab your spot so we know you're coming." },
-    { n: "02", title: "Create your account", body: "Sign up here before the day so you're ready to go." },
-    { n: "03", title: "Check in on the day", body: "Enter the room code on the big screen, form a team (1–4) and get your AI budget." },
+    { n: "02", title: "Show up", body: "No account needed — just bring a laptop and your ideas." },
+    { n: "03", title: "Join with the room code", body: "Type your name and the code on the big screen. Then form a team (1–4) and get your AI budget." },
   ]
 
   return (
@@ -42,7 +40,7 @@ export default async function Landing() {
             </Link>
           ) : (
             <Link href="/sign-in" className={buttonVariants({ variant: "ghost", size: "sm" })}>
-              Sign in
+              Staff sign in
             </Link>
           )}
         </header>
@@ -64,8 +62,8 @@ export default async function Landing() {
                 Go to your dashboard →
               </Link>
             ) : (
-              <Link href="/sign-up" className={cn(buttonVariants({ size: "lg" }), "px-5")}>
-                Create your account →
+              <Link href="/join" className={cn(buttonVariants({ size: "lg" }), "px-5")}>
+                Join with the room code →
               </Link>
             )}
             {event.lumaUrl && (

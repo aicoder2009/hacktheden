@@ -13,6 +13,8 @@ export const keys = {
   ann: (id: string) => `ANN#${id}`,
   sched: (id: string) => `SCHED#${id}`,
   ticket: (id: string) => `TICKET#${id}`,
+  session: (hash: string) => `SESSION#${hash}`,
+  rejoin: (code: string) => `REJOIN#${code}`,
 }
 
 function defaultEvent(): EventMeta {
@@ -21,7 +23,7 @@ function defaultEvent(): EventMeta {
     startsAt: null,
     submissionDeadline: null,
     endsAt: null,
-    lumaUrl: "",
+    lumaUrl: "https://luma.com/61q0tpoz",
     roomCode: randomCode(),
     screenToken: newScreenToken(),
     aiBudgetUsd: 5,

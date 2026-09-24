@@ -8,14 +8,14 @@ Hackathon platform for the Basha DevOps Club. It handles in-person check-in, tea
 
 | Role | Home | What they do |
 |---|---|---|
-| Participant | `/dashboard` | Check in with the room code → form a team (1–4 people) → submit → claim the team's AI key → ask mentors for help |
+| Participant | `/dashboard` | Join with name + room code (no account) → form a team (1–4 people) → submit → claim the team's AI key → ask mentors for help |
 | Mentor | `/mentor` | Claim and resolve help requests |
 | Judge | `/judge` | Score every submitted project against the rubric (autosaves) |
 | Officer | `/admin` | Everything: event settings, people and roles, rubric, leaderboard, results reveal, announcements, schedule, AI keys |
 | Projector | `/screen/<token>` | Countdown, room code, schedule, announcements, live stats, winner reveal |
 
-- **Check-in.** Luma handles RSVPs and has no integration with the app. In the app, a person counts as checked in once they enter the room code shown on the projector (`/verify`).
-- **Roles.** Everyone signs up as a participant. Officers promote people in **Admin → People**. Emails listed in `SUPER_ADMIN_EMAILS` are always officers.
+- **Participants don't make accounts.** They open `/join`, type their name and the room code shown on the projector, and they're in. A secure cookie keeps them signed in on that device; a personal **rejoin code** on their dashboard gets them back in on another device (officers can look it up or reset it in **Admin → People**). Luma handles RSVPs separately and has no integration with the app.
+- **Staff sign in with Clerk.** Officers, judges and mentors use real accounts (`/sign-in`) because they change roles, see scores and release results. New Clerk accounts start as participants; officers promote them in **Admin → People**. Emails listed in `SUPER_ADMIN_EMAILS` are always officers.
 - **AI budget.** Each team gets its own OpenRouter key with a hard spending limit ($5 by default, editable in **Admin → Event**). OpenRouter enforces the limit, so a team can't overspend.
 - **Scoring.**
   - Team score = the mean, across judges, of each judge's weighted rubric score.
@@ -43,8 +43,8 @@ npm install
 cp .env.example .env.local
 ```
 
-### 2. Clerk
-Create an application at [clerk.com](https://clerk.com) and copy both keys into `.env.local`. No other Clerk configuration is needed, because roles are stored in DynamoDB.
+### 2. Clerk (staff only)
+Create an application at [clerk.com](https://clerk.com) and copy both keys into `.env.local`. Only officers, judges and mentors sign in with Clerk; participants join with the room code. No other Clerk configuration is needed, because roles are stored in DynamoDB.
 
 ### 3. AWS
 The app needs one DynamoDB table and one private S3 bucket. The examples use region `us-east-1`, which matches Vercel's default `iad1`.
@@ -129,7 +129,7 @@ npm run test
 
 **Doors open**
 - [ ] On the projector laptop, open **Admin → Overview**, copy the screen link, open it and go fullscreen. Don't sign that laptop in as an officer.
-- [ ] Participants sign in, enter the room code, form teams and claim their AI key.
+- [ ] Participants open the site, join with their name + the room code, form teams and claim their AI key. No sign-up.
 - [ ] If the room code leaks outside the room, **regenerate** it. People already checked in stay checked in.
 
 **Submission deadline**

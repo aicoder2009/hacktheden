@@ -33,6 +33,8 @@ export type User = {
   verifiedAt?: string
   verifyFails: number
   teamId?: string
+  /** Account-less participants: personal code to get back in on another device. */
+  rejoinCode?: string
   createdAt: string
 }
 
@@ -71,8 +73,6 @@ export type Submission = {
   repoUrl: string
   demoUrl: string
   videoUrl: string
-  aiTools: string[]
-  aiToolsOther: string
   photoKeys: string[]
   consentPhotos: boolean
   consentMit: boolean
