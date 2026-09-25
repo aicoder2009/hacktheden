@@ -23,10 +23,11 @@ type SaveState = { kind: "idle" | "saving" | "saved" } | { kind: "error"; messag
 
 const AUTOSAVE_MS = 1500
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+/** `id` links the label to its control so tapping the label focuses the field (matters on phones). */
+function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <Label htmlFor={id}>{label}</Label>
       {children}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
@@ -189,14 +190,15 @@ export function SubmissionForm({
             <CardTitle>The project</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Field label="Project name">
-              <Input value={form.name} onChange={(e) => set("name", e.target.value)} maxLength={80} />
+            <Field id="name" label="Project name">
+              <Input id="name" value={form.name} onChange={(e) => set("name", e.target.value)} maxLength={80} />
             </Field>
-            <Field label="Tagline" hint="One line. What is it?">
-              <Input value={form.tagline} onChange={(e) => set("tagline", e.target.value)} maxLength={140} />
+            <Field id="tagline" label="Tagline" hint="One line. What is it?">
+              <Input id="tagline" value={form.tagline} onChange={(e) => set("tagline", e.target.value)} maxLength={140} />
             </Field>
-            <Field label="Description" hint="What problem does it solve, how does it work, what are you proud of?">
+            <Field id="description" label="Description" hint="What problem does it solve, how does it work, what are you proud of?">
               <Textarea
+                id="description"
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 rows={7}
@@ -212,8 +214,9 @@ export function SubmissionForm({
             <CardDescription>A public GitHub repo, plus a live demo and/or a short video.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Field label="GitHub repo" hint="Add an MIT LICENSE file to the repo.">
+            <Field id="repoUrl" label="GitHub repo" hint="Add an MIT LICENSE file to the repo.">
               <Input
+                id="repoUrl"
                 value={form.repoUrl}
                 onChange={(e) => set("repoUrl", e.target.value)}
                 placeholder="https://github.com/you/project"
@@ -221,11 +224,11 @@ export function SubmissionForm({
               />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Live demo URL">
-                <Input value={form.demoUrl} onChange={(e) => set("demoUrl", e.target.value)} placeholder="https://" inputMode="url" />
+              <Field id="demoUrl" label="Live demo URL">
+                <Input id="demoUrl" value={form.demoUrl} onChange={(e) => set("demoUrl", e.target.value)} placeholder="https://" inputMode="url" />
               </Field>
-              <Field label="Video URL" hint="YouTube, Loom, etc.">
-                <Input value={form.videoUrl} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://" inputMode="url" />
+              <Field id="videoUrl" label="Video URL" hint="YouTube, Loom, etc.">
+                <Input id="videoUrl" value={form.videoUrl} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://" inputMode="url" />
               </Field>
             </div>
           </CardContent>
