@@ -46,6 +46,8 @@ cp .env.example .env.local
 ### 2. Clerk (staff only)
 Create an application at [clerk.com](https://clerk.com) and copy both keys into `.env.local`. Only officers, judges and mentors sign in with Clerk; participants join with the room code. No other Clerk configuration is needed, because roles are stored in DynamoDB.
 
+Production uses a Clerk **production instance** on `hacktheden.vercel.app`. Since a `*.vercel.app` domain can't carry DNS records, the Frontend API is proxied through the app at `/__clerk` (`app/__clerk/[[...path]]/route.ts`): Vercel has the `pk_live`/`sk_live` keys plus `NEXT_PUBLIC_CLERK_PROXY_URL=https://hacktheden.vercel.app/__clerk`, and the same proxy URL is set in Clerk Dashboard → Domains. Local development keeps the dev-instance test keys.
+
 ### 3. AWS
 The app needs one DynamoDB table and one private S3 bucket. The examples use region `us-east-1`, which matches Vercel's default `iad1`. (The live site uses the club sandbox account: table `launchpad`, bucket `launchpad-basha-photos-941377149556`, IAM user `launchpad-app` — these AWS resource names predate the rename and are fine to keep.)
 
