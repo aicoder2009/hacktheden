@@ -47,7 +47,7 @@ cp .env.example .env.local
 Create an application at [clerk.com](https://clerk.com) and copy both keys into `.env.local`. Only officers, judges and mentors sign in with Clerk; participants join with the room code. No other Clerk configuration is needed, because roles are stored in DynamoDB.
 
 ### 3. AWS
-The app needs one DynamoDB table and one private S3 bucket. The examples use region `us-east-1`, which matches Vercel's default `iad1`.
+The app needs one DynamoDB table and one private S3 bucket. The examples use region `us-east-1`, which matches Vercel's default `iad1`. (The live site uses the club sandbox account: table `launchpad`, bucket `launchpad-basha-photos-941377149556`, IAM user `launchpad-app`.)
 
 ```bash
 aws dynamodb create-table --table-name launchpad \
@@ -69,7 +69,7 @@ The browser uploads photos directly to S3, so the bucket needs a CORS rule. Save
 {
   "CORSRules": [
     {
-      "AllowedOrigins": ["http://localhost:3000", "https://bashahacks.vercel.app"],
+      "AllowedOrigins": ["http://localhost:3000", "https://basha-hacks.vercel.app", "https://bashahacks.vercel.app"],
       "AllowedMethods": ["PUT", "GET"],
       "AllowedHeaders": ["Content-Type"],
       "MaxAgeSeconds": 3000
@@ -106,7 +106,7 @@ The app creates its event record on first load, so there is nothing to seed.
 3. *(Recommended)* Restrict teams to cheap models at the account level: Settings → Privacy / Guardrails, allowed models. The keys API can't restrict models per key, but each key's spend cap still applies. The app recommends the models listed in `lib/constants.ts`.
 
 ### 5. Vercel
-The production site is **https://bashahacks.vercel.app** (Vercel project `bh`, connected to this GitHub repo — every push to `main` deploys). Environment variables live in the project settings; add every variable from `.env.example`. Set the function region to `iad1`.
+The production site is **https://basha-hacks.vercel.app** (also reachable at https://bashahacks.vercel.app). It's Vercel project `bh`, connected to this GitHub repo — every push to `main` deploys. `bh.vercel.app` itself is owned by another Vercel account, so it can't be used. Environment variables live in the project settings; add every variable from `.env.example`. Set the function region to `iad1`.
 
 Displayed times are pinned to `America/Phoenix` (`EVENT_TZ` in `lib/format.ts`), so server-rendered times match the venue. Officers should enter times in **Admin** from a browser set to venue time.
 
