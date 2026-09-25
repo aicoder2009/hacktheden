@@ -18,10 +18,10 @@ export default async function JoinPage() {
         {event.name}
       </Link>
       <p className="font-mono text-xs tracking-widest text-primary uppercase">Join</p>
-      <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight">No account needed.</h1>
+      <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight">Welcome to the Den.</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Enter your name and the room code on the big screen. That&apos;s it — you&apos;re in, and you can form a team,
-        submit and get your AI budget.
+        No sign-up — just enter your name and the room code on the big screen. Then you can form a team, submit and
+        get your AI budget.
       </p>
       <JoinForm />
       <p className="mt-10 text-xs text-muted-foreground">
