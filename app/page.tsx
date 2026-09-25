@@ -30,7 +30,7 @@ export default async function Landing() {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-2 font-heading text-sm font-semibold">
             <span className="grid size-6 place-items-center bg-primary text-[10px] font-bold text-primary-foreground">
-              LP
+              DEN
             </span>
             Basha DevOps Club
           </div>
