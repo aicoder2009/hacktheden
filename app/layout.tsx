@@ -1,5 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Outfit, Oxanium } from "next/font/google"
 
 import "./globals.css"
@@ -14,6 +14,9 @@ const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 // Every page reads live event data (and cookies), so nothing is pre-rendered at build time.
 export const dynamic = "force-dynamic"
+
+// Lets the mobile tab bar pad for the iPhone home indicator (safe-area insets).
+export const viewport: Viewport = { viewportFit: "cover", themeColor: "#0b0f0c" }
 
 export const metadata: Metadata = {
   title: { default: "Hack the Den", template: "%s · Hack the Den" },

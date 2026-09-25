@@ -1,5 +1,7 @@
 "use client"
 
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { useState } from "react"
 import useSWR from "swr"
 import { claimAiKey } from "@/actions/ai"
@@ -11,6 +13,7 @@ import { Progress } from "@/components/ui/progress"
 import { RECOMMENDED_MODELS, setupSnippets } from "@/lib/constants"
 import { fmtUsd } from "@/lib/format"
 import type { TeamAI } from "@/lib/types"
+import { cn } from "@/lib/utils"
 
 const fetcher = (url: string) => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(r)))
 
@@ -38,6 +41,7 @@ export function AiCard({ hasTeam }: { hasTeam: boolean }) {
   const { pending, exec } = useAction()
   const [showKey, setShowKey] = useState(false)
   const [snippet, setSnippet] = useState(0)
+  const [setupOpen, setSetupOpen] = useState(false)
   const ai = data?.ai
 
   return (
@@ -98,38 +102,58 @@ export function AiCard({ hasTeam }: { hasTeam: boolean }) {
               <p className="text-muted-foreground">Don&apos;t commit it to GitHub — your repo is public.</p>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="text-muted-foreground">Recommended models</div>
-              <ul className="space-y-1">
-                {RECOMMENDED_MODELS.map((m) => (
-                  <li key={m.id} className="flex items-center justify-between gap-2">
-                    <span className="min-w-0">
-                      <code className="font-mono">{m.id}</code>
-                      <span className="block text-muted-foreground">{m.note}</span>
-                    </span>
-                    <CopyButton text={m.id} />
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <div className="border-t pt-3">
+              <button
+                type="button"
+                aria-expanded={setupOpen}
+                aria-controls="ai-setup"
+                onClick={() => setSetupOpen((o) => !o)}
+                className="flex w-full items-center justify-between py-1 font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Setup instructions
+                <HugeiconsIcon
+                  icon={ArrowDown01Icon}
+                  strokeWidth={2}
+                  className={cn("size-4 transition-transform", setupOpen && "rotate-180")}
+                />
+              </button>
+              {setupOpen && (
+                <div id="ai-setup" className="mt-3 space-y-4">
+                  <div className="space-y-1.5">
+                    <div className="text-muted-foreground">Recommended models</div>
+                    <ul className="space-y-1">
+                      {RECOMMENDED_MODELS.map((m) => (
+                        <li key={m.id} className="flex items-center justify-between gap-2">
+                          <span className="min-w-0">
+                            <code className="font-mono">{m.id}</code>
+                            <span className="block text-muted-foreground">{m.note}</span>
+                          </span>
+                          <CopyButton text={m.id} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-            <div className="space-y-1.5">
-              <div className="text-muted-foreground">Set up your tool</div>
-              <div className="flex flex-wrap gap-1">
-                {setupSnippets(ai.key).map((s, i) => (
-                  <Button key={s.tool} size="xs" variant={i === snippet ? "secondary" : "ghost"} onClick={() => setSnippet(i)}>
-                    {s.tool}
-                  </Button>
-                ))}
-              </div>
-              <div className="relative">
-                <pre className="overflow-x-auto bg-muted p-3 font-mono text-[11px] leading-relaxed">
-                  {setupSnippets(showKey ? ai.key : "<your key>")[snippet].code}
-                </pre>
-                <div className="absolute top-2 right-2">
-                  <CopyButton text={setupSnippets(ai.key)[snippet].code} />
+                  <div className="space-y-1.5">
+                    <div className="text-muted-foreground">Set up your tool</div>
+                    <div className="flex flex-wrap gap-1">
+                      {setupSnippets(ai.key).map((s, i) => (
+                        <Button key={s.tool} size="xs" variant={i === snippet ? "secondary" : "ghost"} onClick={() => setSnippet(i)}>
+                          {s.tool}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="relative">
+                      <pre className="overflow-x-auto bg-muted p-3 font-mono text-[11px] leading-relaxed">
+                        {setupSnippets(showKey ? ai.key : "<your key>")[snippet].code}
+                      </pre>
+                      <div className="absolute top-2 right-2">
+                        <CopyButton text={setupSnippets(ai.key)[snippet].code} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </>
         )}
