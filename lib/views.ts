@@ -54,6 +54,13 @@ export async function buildDashboard(user: User) {
 }
 export type DashboardData = Awaited<ReturnType<typeof buildDashboard>>
 
+/** The newest post alone, for the banner that pins to the top of every signed-in page. */
+export async function buildLatestAnnouncement() {
+  const [announcement] = await listAnnouncements(1)
+  return { now: new Date().toISOString(), announcement: announcement ?? null }
+}
+export type LatestAnnouncement = Awaited<ReturnType<typeof buildLatestAnnouncement>>
+
 async function winnerCard(team: Team | undefined, sub: Submission | undefined) {
   return {
     teamName: team?.name ?? "Unknown team",

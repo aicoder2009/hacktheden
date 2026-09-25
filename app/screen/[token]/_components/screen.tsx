@@ -7,8 +7,9 @@ import { useEffect, useState } from "react"
 import useSWR from "swr"
 import { useNow } from "@/app/mentor/_components/use-now"
 import { Countdown } from "@/components/countdown"
+import { announcementState, bodyScale } from "@/lib/announcements"
 import { fmtAgo, fmtTime } from "@/lib/format"
-import type { ScheduleItem } from "@/lib/types"
+import type { Announcement, ScheduleItem } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import type { ScreenData } from "@/lib/views"
 import { JoinQr } from "./join-qr"
@@ -129,7 +130,8 @@ function Normal({ data, now }: { data: Live; now: number }) {
   const deadline = data.deadline
   const ended = !!deadline && now >= new Date(deadline).getTime()
   const ann = data.announcement
-  const fresh = !!ann && now - new Date(ann.createdAt).getTime() < 5 * 60_000
+  const annState = announcementState(ann, now)
+  const fresh = annState !== "settled"
   const stats = [
     { label: "Checked in", value: data.stats.verified },
     { label: "Teams", value: data.stats.teams },
@@ -150,7 +152,9 @@ function Normal({ data, now }: { data: Live; now: number }) {
       </header>
 
       <section className="flex flex-1 flex-col items-center justify-center text-center">
-        {!deadline ? (
+        {ann && annState === "takeover" ? (
+          <Takeover ann={ann} now={now} deadline={deadline} ended={ended} serverNow={data.serverNow} />
+        ) : !deadline ? (
           <h1 className="max-w-[85vw] font-heading text-[7vw] leading-[0.95] font-bold tracking-tight text-balance">
             {data.name}
           </h1>
@@ -224,6 +228,65 @@ function Normal({ data, now }: { data: Live; now: number }) {
           </div>
         ))}
       </section>
+    </div>
+  )
+}
+
+// Text size by post length, so a one-liner fills the screen and a paragraph still fits.
+const BODY_SIZE = { xl: "text-[5.5vw]", lg: "text-[4.2vw]", md: "text-[3.2vw]", sm: "text-[2.4vw]" }
+
+/**
+ * A brand-new post takes over the middle of the screen for a couple of minutes, with a flash on
+ * arrival so heads turn. Keyed by post id so each new one replays the entrance.
+ */
+function Takeover({
+  ann,
+  now,
+  deadline,
+  ended,
+  serverNow,
+}: {
+  ann: Announcement
+  now: number
+  deadline: string | null
+  ended: boolean
+  serverNow: string
+}) {
+  return (
+    <div key={ann.id} className="flex w-full flex-col items-center">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-10 animate-out bg-primary/40 duration-1000 fill-mode-forwards fade-out"
+      />
+      <div className="w-full animate-in border-[0.35vw] border-primary bg-primary/10 px-[3vw] py-[2.5vw] duration-700 fade-in zoom-in-95">
+        <p className="flex items-center justify-center gap-[1vw] font-mono text-[1.5vw] tracking-[0.4em] text-primary uppercase">
+          <span className="size-[1vw] animate-pulse bg-primary" />
+          Announcement
+        </p>
+        <p
+          className={cn(
+            "mt-[1.5vw] font-heading leading-[1.1] font-bold tracking-tight text-balance whitespace-pre-wrap",
+            BODY_SIZE[bodyScale(ann.body)]
+          )}
+        >
+          {ann.body}
+        </p>
+        <p className="mt-[1.5vw] font-mono text-[1.2vw] text-muted-foreground">
+          {ann.authorName} · {fmtAgo(ann.createdAt, now)}
+        </p>
+      </div>
+      {deadline && (
+        <p className="mt-[1.5vw] font-mono text-[1.6vw] tracking-[0.2em] text-muted-foreground uppercase">
+          {ended ? (
+            "Submissions are closed"
+          ) : (
+            <>
+              <Countdown target={deadline} serverNow={serverNow} doneLabel="Hands off keyboards!" className="text-foreground" />{" "}
+              until submissions close
+            </>
+          )}
+        </p>
+      )}
     </div>
   )
 }

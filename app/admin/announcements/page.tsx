@@ -1,6 +1,7 @@
 import { deleteAnnouncement } from "@/actions/admin"
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ANNOUNCEMENT_FRESH_MS, ANNOUNCEMENT_TAKEOVER_MS } from "@/lib/announcements"
 import { listAnnouncements } from "@/lib/data"
 import { ActionButton } from "../_components/action-button"
 import { AnnouncementForm } from "../_components/announcement-form"
@@ -8,13 +9,16 @@ import { LocalTime } from "../_components/local-time"
 
 export const metadata = { title: "Announcements" }
 
+const TAKEOVER_MIN = ANNOUNCEMENT_TAKEOVER_MS / 60_000
+const FRESH_MIN = ANNOUNCEMENT_FRESH_MS / 60_000
+
 export default async function AnnouncementsPage() {
   const announcements = await listAnnouncements()
   return (
     <>
       <PageHeader
         title="Announcements"
-        description="Posts appear on every participant dashboard, and the newest one shows on the big screen."
+        description={`A new post takes over the big screen for ${TAKEOVER_MIN} minutes and pins to the top of every page in the app for ${FRESH_MIN} minutes. After that it stays in the screen's announcement panel and on participant dashboards.`}
       />
       <div className="grid gap-6 lg:grid-cols-[22rem_1fr]">
         <Card className="h-fit">

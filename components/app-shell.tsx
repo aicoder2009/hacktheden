@@ -5,11 +5,18 @@ import { getEvent } from "@/lib/data"
 import { isDemo } from "@/lib/demo/mode"
 import type { Role } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { buildLatestAnnouncement } from "@/lib/views"
+import { AnnouncementBanner } from "./announcement-banner"
 import { MobileNav } from "./mobile-nav"
 import { SiteHeader } from "./site-header"
 
 export async function AppShell({ role, children }: { role?: Role; children: React.ReactNode }) {
-  const [event, me, clerk] = await Promise.all([getEvent(), getMe(), isDemo() ? null : auth()])
+  const [event, me, clerk, latest] = await Promise.all([
+    getEvent(),
+    getMe(),
+    isDemo() ? null : auth(),
+    buildLatestAnnouncement(),
+  ])
   const accountless =
     !isDemo() && me && !clerk?.userId
       ? { name: me.name, rejoinCode: me.rejoinCode ? formatRejoinCode(me.rejoinCode) : undefined }
@@ -21,6 +28,8 @@ export async function AppShell({ role, children }: { role?: Role; children: Reac
         participant={accountless}
         resultsReleased={event.resultsReleased}
       />
+      {/* New posts pin under the header on every page, so nobody in the room misses one. */}
+      {me && <AnnouncementBanner initial={latest} />}
       <main
         className={cn(
           "mx-auto w-full max-w-6xl px-4 py-6 sm:py-8",
