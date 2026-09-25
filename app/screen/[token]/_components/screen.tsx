@@ -180,14 +180,14 @@ function Normal({ data, now }: { data: Live; now: number }) {
         <Panel label="Room code">
           <div className="flex items-center gap-[1.5vw]">
             <div className="min-w-0">
-              <div className="font-mono text-[5vw] leading-none font-bold tracking-[0.15em] text-primary">
+              <div className="font-mono text-[3.6vw] leading-none font-bold tracking-[0.12em] whitespace-nowrap text-primary">
                 {data.roomCode}
               </div>
               <p className="mt-[1vw] text-[1.1vw] text-muted-foreground">
                 Scan or go to <span className="font-mono text-foreground">{window.location.host}/join</span>
               </p>
             </div>
-            <JoinQr className="size-[9vw] shrink-0" />
+            <JoinQr className="size-[8vw] shrink-0" />
           </div>
         </Panel>
 
