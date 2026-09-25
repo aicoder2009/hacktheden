@@ -117,7 +117,13 @@ export type ScreenData = Awaited<ReturnType<typeof buildScreen>>
 export async function buildResults() {
   const event = await getEvent()
   if (!event.resultsReleased || !event.results) return null
+  // The reveal counts down (3rd → 1st); the results page reads top-down (1st → 3rd, then categories).
   const stages = visibleStages(event.results, Number.MAX_SAFE_INTEGER)
+    .filter((s) => s.kind === "place" || s.kind === "category")
+    .sort((a, b) => {
+      if (a.kind === "place" && b.kind === "place") return a.place - b.place
+      return a.kind === "place" ? -1 : b.kind === "place" ? 1 : 0
+    })
   return (await revealView(event, stages)).flatMap((s) => ("teamName" in s ? [s] : []))
 }
 
