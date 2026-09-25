@@ -14,7 +14,7 @@ export default async function JoinPage() {
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col justify-center px-4 py-10">
       <Link href="/" className="mb-8 flex items-center gap-2 font-heading text-sm font-semibold">
-        <span className="grid size-6 place-items-center bg-primary text-[10px] font-bold text-primary-foreground">LP</span>
+        <span className="grid size-6 place-items-center bg-primary text-[10px] font-bold text-primary-foreground">DEN</span>
         {event.name}
       </Link>
       <p className="font-mono text-xs tracking-widest text-primary uppercase">Join</p>

@@ -1,6 +1,6 @@
-# Launchpad
+# Hack the Den
 
-Hackathon platform for the Basha DevOps Club. It handles in-person check-in, teams, submissions, judging, a live projector screen with a winner reveal, per-team AI budgets, and a mentor help queue.
+Hackathon platform for the Basha DevOps Club (codename "Launchpad" in the code). It handles in-person check-in, teams, submissions, judging, a live projector screen with a winner reveal, per-team AI budgets, and a mentor help queue.
 
 **Stack:** Next.js 16 · Clerk · DynamoDB + S3 (AWS) · OpenRouter · shadcn/ui (Base UI) · SWR polling · Vitest
 
@@ -69,7 +69,7 @@ The browser uploads photos directly to S3, so the bucket needs a CORS rule. Save
 {
   "CORSRules": [
     {
-      "AllowedOrigins": ["http://localhost:3000", "https://basha-hacks.vercel.app", "https://bashahacks.vercel.app"],
+      "AllowedOrigins": ["http://localhost:3000", "https://hacktheden.vercel.app", "https://bashahacks.vercel.app"],
       "AllowedMethods": ["PUT", "GET"],
       "AllowedHeaders": ["Content-Type"],
       "MaxAgeSeconds": 3000
@@ -106,7 +106,7 @@ The app creates its event record on first load, so there is nothing to seed.
 3. *(Recommended)* Restrict teams to cheap models at the account level: Settings → Privacy / Guardrails, allowed models. The keys API can't restrict models per key, but each key's spend cap still applies. The app recommends the models listed in `lib/constants.ts`.
 
 ### 5. Vercel
-The production site is **https://basha-hacks.vercel.app** (also reachable at https://bashahacks.vercel.app). It's Vercel project `bh`, connected to this GitHub repo — every push to `main` deploys. `bh.vercel.app` itself is owned by another Vercel account, so it can't be used. Environment variables live in the project settings; add every variable from `.env.example`. Set the function region to `iad1`.
+The production site is **https://hacktheden.vercel.app** (also reachable at https://bashahacks.vercel.app and https://basha-hacks.vercel.app). It's Vercel project `bh`, connected to this GitHub repo — every push to `main` deploys. `bh.vercel.app` itself is owned by another Vercel account, so it can't be used. Environment variables live in the project settings; add every variable from `.env.example`. Set the function region to `iad1`.
 
 Displayed times are pinned to `America/Phoenix` (`EVENT_TZ` in `lib/format.ts`), so server-rendered times match the venue. Officers should enter times in **Admin** from a browser set to venue time.
 

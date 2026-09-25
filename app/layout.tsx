@@ -16,8 +16,8 @@ const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: { default: "Launchpad", template: "%s · Launchpad" },
-  description: "Basha DevOps Club hackathon platform",
+  title: { default: "Hack the Den", template: "%s · Hack the Den" },
+  description: "Basha DevOps Club's AI-coding hackathon",
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

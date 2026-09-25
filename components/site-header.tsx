@@ -40,7 +40,7 @@ export function SiteHeader({
       <div className="mx-auto flex h-12 max-w-6xl items-center gap-4 px-4">
         <Link href="/" className="flex items-center gap-2 font-heading text-sm font-semibold tracking-tight">
           <span className="grid size-6 place-items-center bg-primary text-[10px] font-bold text-primary-foreground">
-            LP
+            DEN
           </span>
           <span className="hidden sm:inline">{eventName}</span>
         </Link>

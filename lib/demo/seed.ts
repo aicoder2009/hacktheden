@@ -12,7 +12,7 @@ export function seedDemo(pk: string) {
   const put = (sk: string, data: object) => memPut({ PK: pk, SK: sk, ...data })
 
   const event: EventMeta = {
-    name: "Basha DevOps AI Hackathon",
+    name: "Hack the Den",
     startsAt: at(-60),
     submissionDeadline: at(120),
     endsAt: at(210),

@@ -53,8 +53,8 @@ export default async function Landing() {
             {event.name}
           </h1>
           <p className="mt-6 max-w-xl text-base text-muted-foreground">
-            Build something real in a day with AI coding tools. Every team gets its own AI budget, mentors are on hand,
-            and the best projects win.
+            The Basha DevOps Club&apos;s one-day AI-coding hackathon. Build something real with AI coding tools — every
+            team gets its own AI budget, mentors are on hand, and the best projects win.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             {isAuthenticated ? (
