@@ -10,11 +10,30 @@ import { Input } from "@/components/ui/input"
 import type { PublicTeam } from "@/lib/data"
 import { MAX_TEAM_SIZE } from "@/lib/rules"
 
-export function TeamPanel({ meId, team, locked }: { meId: string; team: PublicTeam | null; locked: boolean }) {
+export function TeamPanel({
+  meId,
+  team,
+  locked,
+  prefillCode = "",
+}: {
+  meId: string
+  team: PublicTeam | null
+  locked: boolean
+  /** From an invite link (/team?join=CODE) — lands the teammate straight on "Join" with the code filled in. */
+  prefillCode?: string
+}) {
   const { pending, exec } = useAction()
   const [name, setName] = useState("")
-  const [code, setCode] = useState("")
-  const [copied, setCopied] = useState(false)
+  const [code, setCode] = useState(prefillCode.toUpperCase())
+  const [copied, setCopied] = useState<"code" | "link" | null>(null)
+
+  async function copy(kind: "code" | "link") {
+    if (!team) return
+    const text = kind === "code" ? team.joinCode : `${window.location.origin}/team?join=${team.joinCode}`
+    await navigator.clipboard.writeText(text)
+    setCopied(kind)
+    setTimeout(() => setCopied(null), 1500)
+  }
 
   if (!team) {
     if (locked) return <p className="text-muted-foreground">Team changes are locked.</p>
@@ -41,7 +60,9 @@ export function TeamPanel({ meId, team, locked }: { meId: string; team: PublicTe
         <Card>
           <CardHeader>
             <CardTitle>Join a team</CardTitle>
-            <CardDescription>Ask your teammate for their 6-character code.</CardDescription>
+            <CardDescription>
+              {prefillCode ? "Your invite code is filled in — just hit Join." : "Ask your teammate for their code, or open the invite link they sent you."}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form
@@ -86,18 +107,14 @@ export function TeamPanel({ meId, team, locked }: { meId: string; team: PublicTe
                 <div className="text-muted-foreground">Join code</div>
                 <div className="font-mono text-3xl font-semibold tracking-[0.3em]">{team.joinCode}</div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="ml-auto"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(team.joinCode)
-                  setCopied(true)
-                  setTimeout(() => setCopied(false), 1500)
-                }}
-              >
-                {copied ? "Copied" : "Copy code"}
-              </Button>
+              <div className="ml-auto flex flex-col gap-1.5 sm:flex-row">
+                <Button variant="outline" size="sm" onClick={() => copy("code")}>
+                  {copied === "code" ? "Copied" : "Copy code"}
+                </Button>
+                <Button size="sm" onClick={() => copy("link")}>
+                  {copied === "link" ? "Link copied" : "Copy invite link"}
+                </Button>
+              </div>
             </div>
           )}
 
