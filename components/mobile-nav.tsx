@@ -1,6 +1,6 @@
 "use client"
 
-import { DashboardSquare02Icon, DashboardSquare02Icon, HelpCircleIcon, SentIcon, UserGroupIcon } from "@hugeicons/core-free-icons"
+import { Award01Icon, DashboardSquare02Icon, HelpCircleIcon, SentIcon, UserGroupIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -16,7 +16,7 @@ const TABS = [
 /** Participant bottom tab bar on phones (< sm). AppShell pads <main> so it never covers content. */
 export function MobileNav({ resultsReleased = false }: { resultsReleased?: boolean }) {
   const path = usePathname()
-  const tabs = resultsReleased ? [...TABS, { href: "/results", label: "Results", icon: DashboardSquare02Icon }] : TABS
+  const tabs = resultsReleased ? [...TABS, { href: "/results", label: "Results", icon: Award01Icon }] : TABS
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden">
       <div className={cn("grid h-14", tabs.length === 5 ? "grid-cols-5" : "grid-cols-4")}>
