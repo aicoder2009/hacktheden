@@ -27,6 +27,8 @@ export default async function JudgePage() {
     return { ...r, status }
   })
   const done = items.filter((i) => i.status === "done").length
+  const closed = scoringClosedReason(event)
+  const nextUp = items.find((i) => i.status !== "done")
 
   return (
     <>
@@ -40,7 +42,30 @@ export default async function JudgePage() {
         </div>
       </PageHeader>
 
-      <ScoringBanner reason={scoringClosedReason(event)} />
+      <ScoringBanner reason={closed} />
+
+      {!closed && nextUp && (
+        <Link
+          href={`/judge/${nextUp.sub.teamId}`}
+          className="group mb-6 flex items-center justify-between gap-4 bg-primary p-4 text-primary-foreground transition-colors hover:bg-primary/85"
+        >
+          <div className="min-w-0">
+            <div className="font-heading text-sm font-semibold">Score next unscored team</div>
+            <div className="truncate text-xs opacity-80">
+              {nextUp.sub.name || "Untitled project"} by {nextUp.teamName}
+              {nextUp.status === "partial" && " · in progress"}
+            </div>
+          </div>
+          <span aria-hidden className="text-lg transition-transform group-hover:translate-x-0.5">
+            →
+          </span>
+        </Link>
+      )}
+      {!closed && items.length > 0 && !nextUp && (
+        <p className="mb-6 border border-primary/40 bg-primary/5 px-4 py-3 text-xs text-primary">
+          ✓ You&apos;ve scored every project. Open one to adjust a score.
+        </p>
+      )}
 
       {items.length === 0 ? (
         <div className="border border-dashed p-10 text-center text-sm text-muted-foreground">

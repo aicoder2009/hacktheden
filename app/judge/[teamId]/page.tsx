@@ -38,8 +38,10 @@ export default async function JudgeTeamPage({ params }: { params: Promise<{ team
           <span className="mr-2 font-mono text-xs text-muted-foreground">
             {idx + 1} / {rows.length}
           </span>
-          <NavLink team={prev} label="← Prev" />
-          <NavLink team={next} label="Next →" />
+          <div className="hidden gap-1 lg:flex">
+            <NavLink team={prev} label="← Prev" />
+            <NavLink team={next} label="Next →" />
+          </div>
         </div>
       </nav>
 
@@ -117,6 +119,15 @@ export default async function JudgeTeamPage({ params }: { params: Promise<{ team
           />
         </aside>
       </div>
+
+      {/* Thumb-sized Prev/Next that stay in reach while scrolling on phones and tablets. */}
+      <nav
+        aria-label="Projects"
+        className="sticky bottom-0 z-20 -mx-4 mt-6 grid grid-cols-2 gap-2 border-t bg-background/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
+      >
+        <NavLink team={prev} label="← Prev" className="h-11 text-sm" />
+        <NavLink team={next} label="Next →" className="h-11 text-sm" />
+      </nav>
     </>
   )
 }
@@ -130,16 +141,17 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function NavLink({ team, label }: { team?: { sub: { teamId: string } }; label: string }) {
+function NavLink({ team, label, className }: { team?: { sub: { teamId: string } }; label: string; className?: string }) {
+  const cls = cn(buttonVariants({ variant: "outline", size: "sm" }), className)
   if (!team) {
     return (
-      <span aria-disabled className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none opacity-40")}>
+      <span aria-disabled className={cn(cls, "pointer-events-none opacity-40")}>
         {label}
       </span>
     )
   }
   return (
-    <Link href={`/judge/${team.sub.teamId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+    <Link href={`/judge/${team.sub.teamId}`} className={cls}>
       {label}
     </Link>
   )

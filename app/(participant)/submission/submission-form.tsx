@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useEffectEvent, useRef, useState } from "react"
 import { toast } from "sonner"
 import { presignPhoto, saveSubmission } from "@/actions/submission"
 import { useAction } from "@/components/use-action"
@@ -15,8 +15,13 @@ import { CONSENT_MIT, CONSENT_PHOTOS, MAX_PHOTOS, MAX_PHOTO_BYTES, PHOTO_TYPES }
 import { fmtDateTime } from "@/lib/format"
 import type { SubmissionInput } from "@/lib/schemas"
 import type { Submission } from "@/lib/types"
+import { cn } from "@/lib/utils"
+import { missingRequirements } from "./readiness"
 
 type Photo = { key: string; url: string }
+type SaveState = { kind: "idle" | "saving" | "saved" } | { kind: "error"; message: string }
+
+const AUTOSAVE_MS = 1500
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -51,11 +56,90 @@ export function SubmissionForm({
   })
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
   const [uploading, setUploading] = useState(0)
+  const [submittedHere, setSubmittedHere] = useState(false)
+  const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" })
+  const [serverError, setServerError] = useState<{ message: string; snapshot: string } | null>(null)
+  const [showAll, setShowAll] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
-  const submitted = initial?.status === "submitted"
+  const queue = useRef<Promise<unknown>>(Promise.resolve())
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const submitted = submittedHere || initial?.status === "submitted"
+
+  const payload: SubmissionInput = { ...form, photoKeys: photos.map((p) => p.key) }
+  const snapshot = JSON.stringify(payload)
+  const [savedSnapshot, setSavedSnapshot] = useState(snapshot)
+  const dirty = snapshot !== savedSnapshot
+  const missing = missingRequirements(payload)
+  const error = serverError?.snapshot === snapshot ? serverError.message : null
+  const canAutosave = !locked && !submitted && uploading === 0 && !pending
 
   const set = <K extends keyof SubmissionInput>(k: K, v: SubmissionInput[K]) => setForm((f) => ({ ...f, [k]: v }))
-  const payload = () => ({ ...form, photoKeys: photos.map((p) => p.key) })
+
+  /** Saves run one at a time, so a slow autosave can never land after (and undo) a submit. */
+  function enqueue<T>(fn: () => Promise<T>) {
+    const p = queue.current.then(fn)
+    queue.current = p.catch(() => {})
+    return p
+  }
+
+  const autosave = useEffectEvent((snap: string) => {
+    setSaveState({ kind: "saving" })
+    enqueue(() => saveSubmission(JSON.parse(snap), false)).then(
+      (res) => {
+        if (res.ok) {
+          setSavedSnapshot(snap)
+          setSaveState({ kind: "saved" })
+        } else setSaveState({ kind: "error", message: res.error })
+      },
+      () => setSaveState({ kind: "error", message: "Network error" })
+    )
+  })
+
+  // Debounced draft autosave. Never once submitted — edits there need an explicit "Update submission".
+  useEffect(() => {
+    if (!canAutosave || snapshot === savedSnapshot) return
+    const t = setTimeout(() => autosave(snapshot), AUTOSAVE_MS)
+    timer.current = t
+    return () => clearTimeout(t)
+  }, [canAutosave, snapshot, savedSnapshot])
+
+  // Flush a pending draft change when leaving the page mid-debounce.
+  const latest = useRef({ canAutosave, snapshot, savedSnapshot })
+  useEffect(() => {
+    latest.current = { canAutosave, snapshot, savedSnapshot }
+  })
+  useEffect(() => {
+    const last = latest
+    const q = queue
+    return () => {
+      const l = last.current
+      if (l.canAutosave && l.snapshot !== l.savedSnapshot) {
+        q.current = q.current.then(() => saveSubmission(JSON.parse(l.snapshot), false))
+      }
+    }
+  }, [])
+
+  function save(final: boolean) {
+    clearTimeout(timer.current)
+    const snap = snapshot
+    void exec(
+      () =>
+        enqueue(async () => {
+          const res = await saveSubmission(JSON.parse(snap), final)
+          if (res.ok) {
+            setSavedSnapshot(snap)
+            setServerError(null)
+            setSaveState({ kind: "saved" })
+            if (res.data.status === "submitted") setSubmittedHere(true)
+          } else {
+            setServerError({ message: res.error, snapshot: snap })
+            if (final) setShowAll(true)
+          }
+          return res
+        }),
+      { success: final ? (submitted ? "Submission updated" : "Submitted! 🎉") : "Draft saved" }
+    )
+  }
 
   async function upload(files: FileList | null) {
     if (!files) return
@@ -89,7 +173,7 @@ export function SubmissionForm({
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        exec(() => saveSubmission(payload(), true), { success: submitted ? "Submission updated" : "Submitted! 🎉" })
+        save(true)
       }}
     >
       <fieldset disabled={locked} className="space-y-4">
@@ -165,7 +249,7 @@ export function SubmissionForm({
                       <button
                         type="button"
                         onClick={() => setPhotos((ps) => ps.filter((x) => x.key !== p.key))}
-                        className="absolute top-1 right-1 bg-background/90 px-1.5 text-xs opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                        className="absolute top-1 right-1 bg-background/90 px-2 py-1 text-xs transition-opacity focus:opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100"
                       >
                         Remove
                       </button>
@@ -210,23 +294,110 @@ export function SubmissionForm({
         </Card>
 
         {!locked && (
-          <div className="sticky bottom-0 -mx-4 flex flex-wrap justify-end gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur">
-            {!submitted && (
-              <Button
-                type="button"
-                variant="outline"
-                disabled={pending || uploading > 0}
-                onClick={() => exec(() => saveSubmission(payload(), false), { success: "Draft saved" })}
-              >
-                Save draft
-              </Button>
-            )}
-            <Button type="submit" disabled={pending || uploading > 0}>
-              {submitted ? "Update submission" : "Submit project"}
-            </Button>
+          // On phones, sit on top of the participant tab bar (h-14 + safe area, see components/mobile-nav.tsx).
+          <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 -mx-4 space-y-3 border-t bg-background/95 px-4 py-3 backdrop-blur sm:bottom-0 sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            <Readiness
+              missing={missing}
+              error={error}
+              submitted={submitted}
+              open={showAll}
+              onToggle={() => setShowAll((o) => !o)}
+            />
+            <div className="flex items-center justify-between gap-2">
+              <SaveStatus state={saveState} submitted={submitted} dirty={dirty} />
+              <div className="flex shrink-0 gap-2">
+                {!submitted && (
+                  <Button type="button" variant="outline" disabled={pending || uploading > 0} onClick={() => save(false)}>
+                    Save draft
+                  </Button>
+                )}
+                <Button type="submit" disabled={pending || uploading > 0}>
+                  {submitted ? "Update submission" : "Submit project"}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </fieldset>
     </form>
+  )
+}
+
+function Readiness({
+  missing,
+  error,
+  submitted,
+  open,
+  onToggle,
+}: {
+  missing: string[]
+  error: string | null
+  submitted: boolean
+  open: boolean
+  onToggle: () => void
+}) {
+  const n = missing.length
+  return (
+    <div className="space-y-2 text-xs">
+      {error && (
+        <p role="alert" className="border border-destructive/40 bg-destructive/10 px-2.5 py-1.5 text-destructive">
+          {error}
+        </p>
+      )}
+      {n === 0 ? (
+        <p aria-live="polite" className="font-medium text-primary">
+          ✓ All set — you can {submitted ? "update your submission" : "submit"}
+        </p>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            className="flex w-full min-w-0 items-baseline gap-2 py-0.5 text-left"
+          >
+            <span className="shrink-0 font-heading font-semibold">Ready to {submitted ? "update" : "submit"}?</span>
+            <span aria-live="polite" className="min-w-0 truncate text-muted-foreground">
+              {n} {n === 1 ? "thing" : "things"} left{!open && ` · ${missing[0]}`}
+            </span>
+            <span className="ml-auto shrink-0 text-primary underline-offset-4 hover:underline">
+              {open ? "Hide" : "Show all"}
+            </span>
+          </button>
+          {open && (
+            <ul className="grid gap-x-4 gap-y-1 sm:grid-cols-2">
+              {missing.map((m) => (
+                <li key={m} className="flex gap-2">
+                  <span aria-hidden className="text-muted-foreground">
+                    ○
+                  </span>
+                  {m}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function SaveStatus({ state, submitted, dirty }: { state: SaveState; submitted: boolean; dirty: boolean }) {
+  let text = submitted ? "" : "Drafts save automatically"
+  if (submitted && dirty) text = "Unsaved changes"
+  else if (state.kind === "saving") text = "Saving…"
+  else if (state.kind === "error") text = `Autosave failed: ${state.message}`
+  else if (state.kind === "saved") text = "Saved ✓"
+  return (
+    <span
+      aria-live="polite"
+      className={cn(
+        "min-w-0 truncate text-xs text-muted-foreground",
+        state.kind === "error" && "text-destructive",
+        submitted && dirty && "font-medium text-foreground"
+      )}
+    >
+      {text}
+    </span>
   )
 }
