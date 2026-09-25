@@ -2,7 +2,7 @@ import os from "node:os"
 import path from "node:path"
 import { beforeAll, beforeEach, describe, expect, it } from "vitest"
 
-process.env.DEMO_DB_FILE = path.join(os.tmpdir(), `launchpad-demo-test-${process.pid}.json`)
+process.env.DEMO_DB_FILE = path.join(os.tmpdir(), `hacktheden-demo-test-${process.pid}.json`)
 let db: typeof import("./memory-db")
 beforeAll(async () => {
   db = await import("./memory-db")

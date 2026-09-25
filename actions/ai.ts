@@ -32,7 +32,7 @@ export async function claimAiKey() {
 
     const event = await getEvent()
     try {
-      const { key, info } = await createKey(`launchpad-${env().EVENT_ID}-${team.name}-${team.id}`, event.aiBudgetUsd)
+      const { key, info } = await createKey(`hacktheden-${env().EVENT_ID}-${team.name}-${team.id}`, event.aiBudgetUsd)
       const ai: TeamAI = {
         status: "active",
         hash: info.hash,

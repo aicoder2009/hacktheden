@@ -36,7 +36,7 @@ export function MentorQueue({ meId, initial }: { meId: string; initial: Ticket[]
     .slice(0, 10)
 
   useEffect(() => {
-    document.title = open.length ? `(${open.length}) Help queue · Launchpad` : "Help queue · Launchpad"
+    document.title = open.length ? `(${open.length}) Help queue · Hack the Den` : "Help queue · Hack the Den"
   }, [open.length])
 
   async function act(fn: () => Promise<ActionResult<null>>, success: string) {

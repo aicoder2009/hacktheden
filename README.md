@@ -1,6 +1,6 @@
 # Hack the Den
 
-Hackathon platform for the Basha DevOps Club (codename "Launchpad" in the code). It handles in-person check-in, teams, submissions, judging, a live projector screen with a winner reveal, per-team AI budgets, and a mentor help queue.
+Hackathon platform for the Basha DevOps Club. It handles in-person check-in, teams, submissions, judging, a live projector screen with a winner reveal, per-team AI budgets, and a mentor help queue.
 
 **Stack:** Next.js 16 · Clerk · DynamoDB + S3 (AWS) · OpenRouter · shadcn/ui (Base UI) · SWR polling · Vitest
 
@@ -47,7 +47,7 @@ cp .env.example .env.local
 Create an application at [clerk.com](https://clerk.com) and copy both keys into `.env.local`. Only officers, judges and mentors sign in with Clerk; participants join with the room code. No other Clerk configuration is needed, because roles are stored in DynamoDB.
 
 ### 3. AWS
-The app needs one DynamoDB table and one private S3 bucket. The examples use region `us-east-1`, which matches Vercel's default `iad1`. (The live site uses the club sandbox account: table `launchpad`, bucket `launchpad-basha-photos-941377149556`, IAM user `launchpad-app`.)
+The app needs one DynamoDB table and one private S3 bucket. The examples use region `us-east-1`, which matches Vercel's default `iad1`. (The live site uses the club sandbox account: table `launchpad`, bucket `launchpad-basha-photos-941377149556`, IAM user `launchpad-app` — these AWS resource names predate the rename and are fine to keep.)
 
 ```bash
 aws dynamodb create-table --table-name launchpad \
