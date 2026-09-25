@@ -12,7 +12,7 @@ Hackathon platform for the Basha DevOps Club. It handles in-person check-in, tea
 | Mentor | `/mentor` | Claim and resolve help requests |
 | Judge | `/judge` | Score every submitted project against the rubric (autosaves) |
 | Officer | `/admin` | Everything: event settings, people and roles, rubric, leaderboard, results reveal, announcements, schedule, AI keys |
-| Projector | `/screen/<token>` | Countdown, room code, schedule, announcements, live stats, winner reveal |
+| Projector | `/screen/<token>` | Countdown, room code, schedule, announcements (a new one takes over the screen for two minutes), live stats, winner reveal |
 
 - **Participants don't make accounts.** They open `/join`, type their name and the room code shown on the projector, and they're in. A secure cookie keeps them signed in on that device; a personal **rejoin code** on their dashboard gets them back in on another device (officers can look it up or reset it in **Admin → People**). Luma handles RSVPs separately and has no integration with the app.
 - **Staff sign in with Clerk.** Officers, judges and mentors use real accounts (`/sign-in`) because they change roles, see scores and release results. New Clerk accounts start as participants; officers promote them in **Admin → People**. Emails listed in `SUPER_ADMIN_EMAILS` are always officers.

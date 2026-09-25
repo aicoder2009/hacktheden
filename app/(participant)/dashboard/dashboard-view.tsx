@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import useSWR from "swr"
+import { announcementState } from "@/lib/announcements"
 import { Countdown } from "@/components/countdown"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
@@ -137,14 +138,20 @@ export function DashboardView({ initial }: { initial: DashboardData }) {
                 <p className="text-muted-foreground">Nothing yet — updates from the organizers show up here.</p>
               ) : (
                 <ul className="divide-y">
-                  {data.announcements.map((a) => (
-                    <li key={a.id} className="py-2.5 first:pt-0 last:pb-0">
-                      <p className="text-sm whitespace-pre-wrap">{a.body}</p>
-                      <p className="mt-0.5 text-muted-foreground">
-                        {a.authorName} · {fmtAgo(a.createdAt, new Date(data.now).getTime())}
-                      </p>
-                    </li>
-                  ))}
+                  {data.announcements.map((a) => {
+                    const isNew = announcementState(a, new Date(data.now).getTime()) !== "settled"
+                    return (
+                      <li key={a.id} className="py-2.5 first:pt-0 last:pb-0">
+                        <p className={cn("text-sm whitespace-pre-wrap", isNew && "font-medium")}>{a.body}</p>
+                        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-muted-foreground">
+                          {isNew && <Badge>New</Badge>}
+                          <span>
+                            {a.authorName} · {fmtAgo(a.createdAt, new Date(data.now).getTime())}
+                          </span>
+                        </p>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </CardContent>
