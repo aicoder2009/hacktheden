@@ -1,54 +1,39 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { joinWithRoomCode, rejoinWithCode } from "@/actions/join"
-import { useAction } from "@/components/use-action"
+import { useActionState, useState } from "react"
+import { joinFormAction, rejoinFormAction } from "@/actions/join"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// Uncontrolled inputs + form actions: typing and submitting work even before JavaScript loads.
 export function JoinForm() {
-  const router = useRouter()
-  const { pending, exec } = useAction()
   const [mode, setMode] = useState<"join" | "rejoin">("join")
-  const [name, setName] = useState("")
-  const [code, setCode] = useState("")
-  const [rejoin, setRejoin] = useState("")
-
-  async function onJoin(e: React.FormEvent) {
-    e.preventDefault()
-    const ok = await exec(() => joinWithRoomCode({ name, code }), { success: "You're in!", refresh: false })
-    if (ok !== undefined) router.push("/dashboard")
-  }
-
-  async function onRejoin(e: React.FormEvent) {
-    e.preventDefault()
-    const ok = await exec(() => rejoinWithCode(rejoin), { success: "Welcome back!", refresh: false })
-    if (ok !== undefined) router.push("/dashboard")
-  }
+  const [joined, join, joining] = useActionState(joinFormAction, null)
+  const [rejoined, rejoin, rejoining] = useActionState(rejoinFormAction, null)
 
   if (mode === "rejoin") {
     return (
-      <form onSubmit={onRejoin} className="mt-8 space-y-5">
+      <form action={rejoin} className="mt-8 space-y-5">
         <div className="space-y-1.5">
           <Label htmlFor="rejoin">Your rejoin code</Label>
           <Input
             id="rejoin"
-            value={rejoin}
-            onChange={(e) => setRejoin(e.target.value.toUpperCase())}
+            name="rejoin"
+            defaultValue={rejoined?.values.rejoin}
             placeholder="ABCD-2345"
             autoComplete="off"
             autoCapitalize="characters"
             maxLength={9}
-            className="h-14 text-center font-mono text-2xl tracking-[0.3em]"
+            className="h-14 text-center font-mono text-2xl tracking-[0.3em] uppercase"
             required
             autoFocus
           />
           <p className="text-xs text-muted-foreground">It&apos;s on your dashboard on the device you joined from.</p>
         </div>
-        <Button type="submit" size="lg" className="w-full" disabled={pending || rejoin.length < 8}>
-          {pending ? "Checking…" : "Get back in"}
+        {rejoined && <p role="alert" className="text-sm text-destructive">{rejoined.error}</p>}
+        <Button type="submit" size="lg" className="w-full" disabled={rejoining}>
+          {rejoining ? "Checking…" : "Get back in"}
         </Button>
         <button type="button" onClick={() => setMode("join")} className="text-xs text-muted-foreground underline underline-offset-2">
           ← Joining for the first time
@@ -58,27 +43,28 @@ export function JoinForm() {
   }
 
   return (
-    <form onSubmit={onJoin} className="mt-8 space-y-5">
+    <form action={join} className="mt-8 space-y-5">
       <div className="space-y-1.5">
         <Label htmlFor="name">Your name</Label>
-        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="How teammates and judges see you" required autoFocus />
+        <Input id="name" name="name" defaultValue={joined?.values.name} placeholder="How teammates and judges see you" autoComplete="name" required minLength={2} maxLength={60} />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="code">Room code</Label>
         <Input
           id="code"
-          value={code}
-          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          name="code"
+          defaultValue={joined?.values.code}
           placeholder="ABC234"
           autoComplete="off"
           autoCapitalize="characters"
           maxLength={8}
-          className="h-14 text-center font-mono text-3xl tracking-[0.4em]"
+          className="h-14 text-center font-mono text-3xl tracking-[0.4em] uppercase"
           required
         />
       </div>
-      <Button type="submit" size="lg" className="w-full" disabled={pending || code.length < 4}>
-        {pending ? "Joining…" : "Join the hackathon"}
+      {joined && <p role="alert" className="text-sm text-destructive">{joined.error}</p>}
+      <Button type="submit" size="lg" className="w-full" disabled={joining}>
+        {joining ? "Joining…" : "Join the hackathon"}
       </Button>
       <button type="button" onClick={() => setMode("rejoin")} className="text-xs text-muted-foreground underline underline-offset-2">
         Already joined on another device? Use your rejoin code

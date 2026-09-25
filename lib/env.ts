@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { isLocalData } from "./demo/mode"
+import { isDemo, isLocalData } from "./demo/mode"
 
 const schema = z.object({
   EVENT_ID: z.string().min(1),
@@ -19,7 +19,7 @@ export function env() {
   cached ??= schema.parse(
     isLocalData()
       ? {
-          EVENT_ID: "demo",
+          EVENT_ID: isDemo() ? "demo" : "basha-2026-11",
           SUPER_ADMIN_EMAILS: "karthickarun2009@gmail.com",
           APP_AWS_REGION: "local",
           APP_AWS_ACCESS_KEY_ID: "demo",

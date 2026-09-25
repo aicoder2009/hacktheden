@@ -20,7 +20,7 @@ export const keys = {
 function defaultEvent(): EventMeta {
   return {
     name: "Basha DevOps AI Hackathon",
-    startsAt: null,
+    startsAt: "2026-11-14T16:00:00.000Z", // Sat Nov 14, 9:00 AM Arizona — edit in Admin → Event settings
     submissionDeadline: null,
     endsAt: null,
     lumaUrl: "https://luma.com/61q0tpoz",

@@ -63,6 +63,27 @@ export async function rejoinWithCode(rawCode: string) {
   })
 }
 
+/**
+ * Form-action versions: a plain <form action> works before the page's JavaScript loads, so
+ * attendees on slow venue Wi-Fi never lose what they typed. On failure they get the error plus
+ * what they entered (React resets the form after an action); on success they're redirected.
+ */
+export type FormState = { error: string; values: Record<string, string> } | null
+
+export async function joinFormAction(_prev: FormState, fd: FormData): Promise<FormState> {
+  const values = { name: String(fd.get("name") ?? ""), code: String(fd.get("code") ?? "") }
+  const res = await joinWithRoomCode(values)
+  if (!res.ok) return { error: res.error, values }
+  redirect("/dashboard")
+}
+
+export async function rejoinFormAction(_prev: FormState, fd: FormData): Promise<FormState> {
+  const values = { rejoin: String(fd.get("rejoin") ?? "") }
+  const res = await rejoinWithCode(values.rejoin)
+  if (!res.ok) return { error: res.error, values }
+  redirect("/dashboard")
+}
+
 export async function leaveSession() {
   await destroySession()
   redirect("/")
