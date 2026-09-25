@@ -15,8 +15,8 @@ const g = globalThis as unknown as { __demoDb?: Map<string, Item> }
 function store(): Map<string, Item> {
   if (!g.__demoDb) {
     g.__demoDb = new Map()
-    if (fs.existsSync(FILE)) {
-      for (const it of JSON.parse(fs.readFileSync(FILE, "utf8")) as Item[]) g.__demoDb.set(k(it.PK, it.SK), it)
+    if (fs.existsSync(/* turbopackIgnore: true */ FILE)) {
+      for (const it of JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ FILE, "utf8")) as Item[]) g.__demoDb.set(k(it.PK, it.SK), it)
     }
   }
   return g.__demoDb
@@ -24,7 +24,7 @@ function store(): Map<string, Item> {
 
 function save() {
   fs.mkdirSync(path.dirname(FILE), { recursive: true })
-  fs.writeFileSync(FILE, JSON.stringify([...store().values()], null, 1))
+  fs.writeFileSync(/* turbopackIgnore: true */ FILE, JSON.stringify([...store().values()], null, 1))
 }
 
 export function resetStore() {

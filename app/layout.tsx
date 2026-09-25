@@ -12,6 +12,9 @@ const oxaniumHeading = Oxanium({ subsets: ["latin"], variable: "--font-heading" 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
 const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
+// Every page reads live event data (and cookies), so nothing is pre-rendered at build time.
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: { default: "Launchpad", template: "%s · Launchpad" },
   description: "Basha DevOps Club hackathon platform",

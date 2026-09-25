@@ -38,3 +38,4 @@ next-env.d.ts
 
 # local demo mode data
 .demo/
+.vercel
