@@ -11,6 +11,7 @@ import { fmtAgo, fmtTime } from "@/lib/format"
 import type { ScheduleItem } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import type { ScreenData } from "@/lib/views"
+import { JoinQr } from "./join-qr"
 import { Reveal } from "./reveal"
 
 /** `skew` = server clock − this machine's clock, measured on each poll (the projector laptop may be off). */
@@ -177,12 +178,17 @@ function Normal({ data, now }: { data: Live; now: number }) {
 
       <section className="grid grid-cols-3 gap-px border bg-border">
         <Panel label="Room code">
-          <div className="font-mono text-[5vw] leading-none font-bold tracking-[0.15em] text-primary">
-            {data.roomCode}
+          <div className="flex items-center gap-[1.5vw]">
+            <div className="min-w-0">
+              <div className="font-mono text-[5vw] leading-none font-bold tracking-[0.15em] text-primary">
+                {data.roomCode}
+              </div>
+              <p className="mt-[1vw] text-[1.1vw] text-muted-foreground">
+                Scan or go to <span className="font-mono text-foreground">{window.location.host}/join</span>
+              </p>
+            </div>
+            <JoinQr className="size-[9vw] shrink-0" />
           </div>
-          <p className="mt-[1vw] text-[1.1vw] text-muted-foreground">
-            Join at <span className="font-mono text-foreground">{window.location.host}/join</span>
-          </p>
         </Panel>
 
         <Panel label="Schedule">

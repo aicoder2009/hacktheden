@@ -106,7 +106,7 @@ The app creates its event record on first load, so there is nothing to seed.
 3. *(Recommended)* Restrict teams to cheap models at the account level: Settings → Privacy / Guardrails, allowed models. The keys API can't restrict models per key, but each key's spend cap still applies. The app recommends the models listed in `lib/constants.ts`.
 
 ### 5. Vercel
-The production site is **https://hacktheden.vercel.app** (also reachable at https://bashahacks.vercel.app and https://basha-hacks.vercel.app). It's Vercel project `bh`, connected to this GitHub repo — every push to `main` deploys. `bh.vercel.app` itself is owned by another Vercel account, so it can't be used. Environment variables live in the project settings; add every variable from `.env.example`. Set the function region to `iad1`.
+The production site is **https://hacktheden.vercel.app** (also reachable at https://bashahacks.vercel.app and https://basha-hacks.vercel.app). It's Vercel project `hacktheden`, connected to this GitHub repo — every push to `main` deploys. `bh.vercel.app` itself is owned by another Vercel account, so it can't be used. Environment variables live in the project settings; add every variable from `.env.example`. Set the function region to `iad1`.
 
 Displayed times are pinned to `America/Phoenix` (`EVENT_TZ` in `lib/format.ts`), so server-rendered times match the venue. Officers should enter times in **Admin** from a browser set to venue time.
 
