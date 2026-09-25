@@ -13,6 +13,7 @@ import {
 } from "./data"
 import { isActiveTicket, isLocked } from "./rules"
 import { visibleStages, type Stage } from "./reveal"
+import { aiEnabled } from "./openrouter"
 import { presignGet } from "./s3"
 import { currentAndNext } from "./schedule"
 import { judgeScore, rankTeams } from "./scoring"
@@ -45,6 +46,7 @@ export async function buildDashboard(user: User) {
     me: { id: user.id, name: user.name, verified: !!user.verifiedAt, rejoinCode: user.rejoinCode ?? null },
     event: publicEvent(event),
     locked: isLocked(event, new Date()),
+    aiEnabled: aiEnabled(),
     team: team ? publicTeam(team) : null,
     submission: submission ? { status: submission.status, name: submission.name, updatedAt: submission.updatedAt } : null,
     ticket: team ? (tickets.filter((t) => t.teamId === team.id).at(-1) ?? null) : null,

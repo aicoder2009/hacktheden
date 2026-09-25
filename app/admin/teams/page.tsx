@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { listSubmissions, listTeams } from "@/lib/data"
 import { fmtUsd } from "@/lib/format"
+import { aiEnabled } from "@/lib/openrouter"
 import { ActionButton } from "../_components/action-button"
 import { LocalTime } from "../_components/local-time"
 import { SubmissionBadge } from "../_components/submission-badge"
@@ -12,6 +13,7 @@ export const metadata = { title: "Teams" }
 
 export default async function TeamsPage() {
   const [teams, subs] = await Promise.all([listTeams(), listSubmissions()])
+  const ai = aiEnabled()
   const subStatus = new Map(subs.map((s) => [s.teamId, s.status]))
   // Only non-secret fields leave this function — never the raw key.
   const rows = teams
@@ -38,19 +40,27 @@ export default async function TeamsPage() {
     <>
       <PageHeader
         title="Teams"
-        description={`${rows.length} teams · ${activeKeys} AI keys · ${fmtUsd(totalUsage)} spent (as of last refresh)`}
+        description={ai ? `${rows.length} teams · ${activeKeys} AI keys · ${fmtUsd(totalUsage)} spent (as of last refresh)` : `${rows.length} teams`}
       >
-        <ActionButton action={refreshAiUsage} success="AI usage refreshed">
-          Refresh AI usage
-        </ActionButton>
-        <ActionButton
-          action={disableAllAiKeys}
-          variant="destructive"
-          confirm="Disable every team's AI key? Use this at the end of the event. You can re-enable keys one by one."
-          success="All AI keys disabled"
-        >
-          Disable all AI keys
-        </ActionButton>
+        {ai ? (
+          <>
+            <ActionButton action={refreshAiUsage} success="AI usage refreshed">
+              Refresh AI usage
+            </ActionButton>
+            <ActionButton
+              action={disableAllAiKeys}
+              variant="destructive"
+              confirm="Disable every team's AI key? Use this at the end of the event. You can re-enable keys one by one."
+              success="All AI keys disabled"
+            >
+              Disable all AI keys
+            </ActionButton>
+          </>
+        ) : (
+          <p className="text-muted-foreground">
+            AI keys are off — set <code className="font-mono">OPENROUTER_PROVISIONING_KEY</code> to turn them on.
+          </p>
+        )}
       </PageHeader>
       <div className="border">
         <Table>
@@ -60,8 +70,8 @@ export default async function TeamsPage() {
               <TableHead>Join code</TableHead>
               <TableHead>Members</TableHead>
               <TableHead>Submission</TableHead>
-              <TableHead>AI usage</TableHead>
-              <TableHead className="text-right">AI key</TableHead>
+              {ai && <TableHead>AI usage</TableHead>}
+              {ai && <TableHead className="text-right">AI key</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,7 +92,8 @@ export default async function TeamsPage() {
                 <TableCell>
                   <SubmissionBadge status={t.submission} />
                 </TableCell>
-                <TableCell>
+                {ai && (
+                  <TableCell>
                   {t.ai?.status === "active" ? (
                     <div className="grid gap-0.5">
                       <div className="flex items-center gap-2">
@@ -100,8 +111,10 @@ export default async function TeamsPage() {
                   ) : (
                     <span className="text-muted-foreground">No key</span>
                   )}
-                </TableCell>
-                <TableCell className="text-right">
+                  </TableCell>
+                )}
+                {ai && (
+                  <TableCell className="text-right">
                   {t.ai?.status === "active" && (
                     <ActionButton
                       size="xs"
@@ -113,12 +126,13 @@ export default async function TeamsPage() {
                       {t.ai.disabled ? "Enable" : "Disable"}
                     </ActionButton>
                   )}
-                </TableCell>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={ai ? 6 : 4} className="py-8 text-center text-muted-foreground">
                   No teams yet.
                 </TableCell>
               </TableRow>

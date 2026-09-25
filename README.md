@@ -104,7 +104,7 @@ The app creates its event record on first load, so there is nothing to seed.
 
 ### 4. OpenRouter
 1. Add credits to the account. Plan for budget × number of teams plus some buffer, for example about $100 for 20 teams at $5 each.
-2. Create a **provisioning key** under Settings → Provisioning API Keys and set it as `OPENROUTER_PROVISIONING_KEY`.
+2. Create a **provisioning key** under Settings → Provisioning API Keys and set it as `OPENROUTER_PROVISIONING_KEY`. Until it is set, the AI-key card and the "Get your AI key" step are hidden from participants and the AI controls disappear from **Admin → Teams**, so the site works fine without OpenRouter.
 3. *(Recommended)* Restrict teams to cheap models at the account level: Settings → Privacy / Guardrails, allowed models. The keys API can't restrict models per key, but each key's spend cap still applies. The app recommends the models listed in `lib/constants.ts`.
 
 ### 5. Vercel

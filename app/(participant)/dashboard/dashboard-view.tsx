@@ -171,9 +171,11 @@ export function DashboardView({ initial }: { initial: DashboardData }) {
               </CardContent>
             </Card>
           )}
-          <div id="ai" className="scroll-mt-16">
-            <AiCard hasTeam={!!team} />
-          </div>
+          {data.aiEnabled && (
+            <div id="ai" className="scroll-mt-16">
+              <AiCard hasTeam={!!team} />
+            </div>
+          )}
 
           <Card>
             <CardHeader>

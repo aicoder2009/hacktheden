@@ -5,18 +5,18 @@ import type { DashboardData } from "@/lib/views"
 
 /** The participant's path through the day, with the next thing to do highlighted. */
 export function NextSteps({ data }: { data: DashboardData }) {
-  const { team, submission, locked } = data
+  const { team, submission, locked, aiEnabled } = data
   const steps = [
     { label: "Check in", done: true, href: "/dashboard", cta: "" },
     { label: "Join a team", done: !!team, href: "/team", cta: "Create or join a team" },
-    { label: "Get your AI key", done: team?.ai?.status === "active", href: "#ai", cta: "Get your AI key" },
+    ...(aiEnabled ? [{ label: "Get your AI key", done: team?.ai?.status === "active", href: "#ai", cta: "Get your AI key" }] : []),
     { label: "Submit your project", done: submission?.status === "submitted", href: "/submission", cta: submission ? "Finish your submission" : "Start your submission" },
   ]
   const next = locked ? undefined : steps.find((s) => !s.done)
 
   return (
     <section className="border bg-card">
-      <ol className="grid grid-cols-2 border-b text-xs sm:grid-cols-4">
+      <ol className={cn("grid grid-cols-2 border-b text-xs", steps.length === 4 ? "sm:grid-cols-4" : "sm:grid-cols-3")}>
         {steps.map((s, i) => (
           <li
             key={s.label}

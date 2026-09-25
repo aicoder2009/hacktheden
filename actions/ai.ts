@@ -5,7 +5,7 @@ import { AppError, requireVerifiedParticipant } from "@/lib/auth"
 import { getEvent, getTeam, keys } from "@/lib/data"
 import { isConditionFailure, updateItem } from "@/lib/db"
 import { env } from "@/lib/env"
-import { createKey } from "@/lib/openrouter"
+import { aiEnabled, createKey } from "@/lib/openrouter"
 import type { TeamAI } from "@/lib/types"
 
 const PENDING_TIMEOUT_MS = 60_000
@@ -13,6 +13,7 @@ const PENDING_TIMEOUT_MS = 60_000
 /** Creates the team's budget-capped OpenRouter key. A pending marker prevents duplicate keys. */
 export async function claimAiKey() {
   return run(async () => {
+    if (!aiEnabled()) throw new AppError("AI keys aren't turned on for this event.")
     const user = await requireVerifiedParticipant()
     const team = user.teamId && (await getTeam(user.teamId))
     if (!team) throw new AppError("Join or create a team first.")

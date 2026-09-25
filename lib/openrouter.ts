@@ -3,6 +3,9 @@ import { env } from "./env"
 
 const BASE = "https://openrouter.ai/api/v1/keys"
 
+/** AI keys are offered only once a provisioning key exists (local/demo mode fakes one). */
+export const aiEnabled = () => isLocalData() || !!env().OPENROUTER_PROVISIONING_KEY
+
 export type KeyInfo = {
   hash: string
   name: string
